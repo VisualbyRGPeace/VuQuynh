@@ -19,6 +19,14 @@
     font-weight: normal;
     font-style: normal;
     font-display: swap;
+
+    /* ---------- GILROY MEDIUM ---------- */
+@font-face {
+  font-family: 'Gilroy-Medium';
+  src: url('./GilroyMedium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
   }
 
   :root{
@@ -169,22 +177,23 @@
   }
 
   .hero-date{
-    margin:34px 0 6px;
-    font-family:var(--serif-sc);
-    font-size:clamp(15px,2.4vw,19px);
-    letter-spacing:.22em;
-    color:var(--cream-200);
-    opacity:0;
-    animation:riseIn 1s ease forwards .6s;
-  }
+  margin:34px 0 6px;
+  font-family:'Gilroy-Medium';
+  font-size:clamp(15px,2.4vw,19px);
+  letter-spacing:.22em;
+  color:var(--cream-200);
+  opacity:0;
+  animation:riseIn 1s ease forwards .6s;
+}
 
-  .hero-place{
-    margin:0 0 46px;
-    font-style:italic;
-    font-size:17px;
-    color:var(--cream-200);
-    opacity:.85;
-    animation:riseIn 1s ease forwards .75s;
+.hero-place{
+  margin:0 0 46px;
+  font-family:'Gilroy-Medium';
+  font-style:normal;
+  font-size:17px;
+  color:var(--cream-200);
+  opacity:.85;
+  animation:riseIn 1s ease forwards .75s;
   }
 
   .countdown{
