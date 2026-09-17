@@ -584,25 +584,16 @@
     --delay:0s;
     position:relative;
     width:150px;
-    padding:20px 14px 14px;
+    padding:22px 14px 14px;
     background:var(--cream-100);
     color:var(--ink-900);
     border:1px solid rgba(178,138,82,.4);
+    border-radius:14px;
     box-shadow:0 6px 16px rgba(0,0,0,.22);
     text-align:center;
     transform:rotate(var(--rot));
     animation:stampDrop .7s cubic-bezier(.28,1.55,.5,1) var(--delay) both;
     transition:transform .3s ease, box-shadow .3s ease;
-    -webkit-mask-image:
-      radial-gradient(circle 5px at 0 0, transparent 5px, black 5.5px),
-      radial-gradient(circle 5px at 100% 0, transparent 5px, black 5.5px),
-      radial-gradient(circle 5px at 0 100%, transparent 5px, black 5.5px),
-      radial-gradient(circle 5px at 100% 100%, transparent 5px, black 5.5px);
-    mask-image:
-      radial-gradient(circle 5px at 0 0, transparent 5px, black 5.5px),
-      radial-gradient(circle 5px at 100% 0, transparent 5px, black 5.5px),
-      radial-gradient(circle 5px at 0 100%, transparent 5px, black 5.5px),
-      radial-gradient(circle 5px at 100% 100%, transparent 5px, black 5.5px);
   }
 
   .stamp:hover,
@@ -615,15 +606,16 @@
   .stamp::before{
     content:"";
     position:absolute;
-    top:-7px;
+    top:-8px;
     left:50%;
-    width:9px;
-    height:9px;
+    width:11px;
+    height:11px;
     border-radius:50%;
     background:radial-gradient(circle at 35% 30%, #e8c99a, var(--clay-600) 75%);
     box-shadow:0 2px 4px rgba(0,0,0,.35);
     transform:translateX(-50%) scale(0);
     animation:pinPop .4s ease calc(var(--delay) + .45s) both;
+    z-index:1;
   }
 
   .stamp::after{
@@ -631,6 +623,7 @@
     position:absolute;
     inset:0;
     border:1.5px solid var(--gold-500);
+    border-radius:14px;
     opacity:0;
     transform:scale(.7);
     pointer-events:none;
