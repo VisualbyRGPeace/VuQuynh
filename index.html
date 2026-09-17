@@ -132,18 +132,15 @@
     overflow:hidden;
   }
 
-  .hero::before,
-  .hero::after{
+  .hero::before{
     content:"";
     position:absolute;
     width:1px;
     height:60px;
     background:linear-gradient(var(--gold-300), transparent);
     left:50%;
+    top:30px;
   }
-
-  .hero::before{ top:30px; }
-  .hero::after{ bottom:30px; transform:rotate(180deg); }
 
   .hero-eyebrow{
     font-family:var(--script);
@@ -226,7 +223,7 @@
     transform:translateX(-50%);
     width:1px;
     height:32px;
-    background:linear-gradient(var(--gold-300), transparent);
+    background:linear-gradient(to top, var(--gold-300), transparent);
   }
 
   /* ---------- SECTION SHELL ---------- */
@@ -478,7 +475,7 @@
   }
 
   /* ---------- RSVP ---------- */
-  .rsvp{ background:var(--pine-900); color:var(--cream-100); }
+  .rsvp{ background:var(--pine-900); color:var(--cream-100); padding-bottom:70px; }
 
   .rsvp .deadline{
     text-align:center;
@@ -764,56 +761,23 @@
 <section class="rsvp" id="rsvp">
   <div class="section-inner">
 
-    <h2 class="heading on-dark">RSVP</h2>
+    <h2 class="heading on-dark">Gửi lời chúc</h2>
 
-    <!--
-      Form này dùng Formspree (miễn phí) để gửi kết quả RSVP về email của bạn
-      mà không cần máy chủ riêng — phù hợp cho trang tĩnh trên GitHub Pages.
-
-      Cách kích hoạt:
-      1. Tạo tài khoản miễn phí tại https://formspree.io
-      2. Tạo một "Form", Formspree sẽ cho bạn một endpoint dạng
-         https://formspree.io/f/xxxxxxx
-      3. Thay giá trị trong action="" bên dưới bằng endpoint đó.
-      Trước khi làm bước trên, form sẽ không gửi đi đâu cả — chỉ hiển thị demo.
-    -->
-
-    <form class="rsvp-form" id="rsvpForm" action="https://formspree.io/f/REPLACE_WITH_YOUR_ID" method="POST">
+    <form class="rsvp-form" id="rsvpForm">
 
       <div class="field">
         <label for="fullName">Họ và tên</label>
         <input type="text" id="fullName" name="name" required autocomplete="name">
       </div>
 
-      <div class="field-row">
-        <div class="field">
-          <label for="attending">Bạn có tham dự?</label>
-          <select id="attending" name="attending" required>
-            <option value="" disabled selected>Chọn một phương án</option>
-            <option value="Có, tôi sẽ tham dự">Có, tôi sẽ tham dự</option>
-            <option value="Rất tiếc, tôi không thể tham dự">Rất tiếc, tôi không thể tham dự</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="guests">Số lượng khách (kể cả bạn)</label>
-          <input type="number" id="guests" name="guests" min="1" max="10" value="1">
-        </div>
-      </div>
-
       <div class="field">
-        <label for="message">Lời nhắn gửi cô dâu &amp; chú rể (không bắt buộc)</label>
+        <label for="message">Lời chúc gửi cô dâu &amp; chú rể</label>
         <textarea id="message" name="message" rows="3"></textarea>
       </div>
 
-      <button class="rsvp-submit" type="submit">Gửi phản hồi</button>
+      <button class="rsvp-submit" type="submit">Gửi lời chúc</button>
 
       <p class="form-status" id="formStatus"></p>
-
-      <p class="form-note">
-        Cần kết nối Formspree (hoặc dịch vụ tương tự) để nhận phản hồi —
-        xem hướng dẫn trong README.
-      </p>
 
     </form>
 
@@ -881,40 +845,39 @@
   setInterval(tick, 1000);
 
 
-  // RSVP submit
+  // Gửi lời chúc — mở email client của khách với nội dung đã điền sẵn,
+  // gửi tới nguyenanhvucvv@gmail.com. Trang tĩnh không có máy chủ riêng
+  // nên đây là cách gửi thư đáng tin cậy nhất mà không cần dịch vụ ngoài.
   const form = document.getElementById('rsvpForm');
   const status = document.getElementById('formStatus');
+  const RSVP_EMAIL = 'nguyenanhvucvv@gmail.com';
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    if (form.action.includes('REPLACE_WITH_YOUR_ID')){
-      status.textContent = 'Demo: chưa kết nối nơi nhận RSVP. Xem README để kích hoạt.';
-      status.style.color = '#d7b781';
+    const name = document.getElementById('fullName').value.trim();
+    const message = document.getElementById('message').value.trim();
+
+    if (!name){
+      status.textContent = 'Vui lòng điền họ và tên.';
+      status.style.color = '#e0a0a0';
       return;
     }
 
-    status.textContent = 'Đang gửi...';
+    const subject = `Lời chúc đám cưới từ ${name}`;
+    const body =
+      `Họ và tên: ${name}\n` +
+      `Lời chúc: ${message || '(không có)'}`;
 
-    try{
-      const res = await fetch(form.action, {
-        method:'POST',
-        body:new FormData(form),
-        headers:{ 'Accept':'application/json' }
-      });
+    const mailtoLink =
+      `mailto:${RSVP_EMAIL}` +
+      `?subject=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(body)}`;
 
-      if (res.ok){
-        status.textContent = 'Cảm ơn bạn! Chúng tôi đã nhận được phản hồi.';
-        status.style.color = '#d7b781';
-        form.reset();
-      } else {
-        status.textContent = 'Có lỗi xảy ra, vui lòng thử lại sau.';
-        status.style.color = '#e0a0a0';
-      }
-    } catch(err){
-      status.textContent = 'Có lỗi xảy ra, vui lòng thử lại sau.';
-      status.style.color = '#e0a0a0';
-    }
+    window.location.href = mailtoLink;
+
+    status.textContent = 'Đang mở ứng dụng email của bạn để gửi lời chúc...';
+    status.style.color = '#d7b781';
   });
 
 </script>
