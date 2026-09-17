@@ -625,9 +625,9 @@
     border:1.5px solid var(--gold-500);
     border-radius:14px;
     opacity:0;
-    transform:scale(.7);
+    transform:scale(.88);
     pointer-events:none;
-    animation:sealRipple .6s ease-out calc(var(--delay) + .55s) both;
+    animation:sealRipple 2.6s ease-out calc(var(--delay) + .55s) infinite;
   }
 
   .stamp .stamp-name{
@@ -684,8 +684,9 @@
   }
 
   @keyframes sealRipple{
-    0%{ opacity:.55; transform:scale(.7); }
-    100%{ opacity:0; transform:scale(1.18); }
+    0%{ opacity:.6; transform:scale(.88); }
+    35%{ opacity:.4; transform:scale(1.03); }
+    100%{ opacity:0; transform:scale(1.22); }
   }
 
   @media (prefers-reduced-motion: reduce){
