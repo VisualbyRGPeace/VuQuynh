@@ -10,6 +10,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+SC:wght@500;600&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="./logo.png">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <style>
 
@@ -557,6 +559,78 @@
     min-height:1.2em;
   }
 
+  /* ---------- WISHES WALL / TEM ---------- */
+  .wishes-wall{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:14px;
+    margin-top:48px;
+    max-width:960px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+  .wishes-empty{
+    text-align:center;
+    font-size:14px;
+    font-style:italic;
+    color:rgba(248,242,230,.55);
+    margin-top:40px;
+  }
+
+  .stamp{
+    --rot:0deg;
+    position:relative;
+    width:150px;
+    padding:16px 14px 14px;
+    background:var(--cream-100);
+    color:var(--ink-900);
+    border:1px solid rgba(178,138,82,.4);
+    box-shadow:0 6px 16px rgba(0,0,0,.22);
+    transform:rotate(var(--rot));
+    animation:stampIn .6s cubic-bezier(.2,.7,.3,1) both;
+    -webkit-mask-image:
+      radial-gradient(circle 5px at 0 0, transparent 5px, black 5.5px),
+      radial-gradient(circle 5px at 100% 0, transparent 5px, black 5.5px),
+      radial-gradient(circle 5px at 0 100%, transparent 5px, black 5.5px),
+      radial-gradient(circle 5px at 100% 100%, transparent 5px, black 5.5px);
+    mask-image:
+      radial-gradient(circle 5px at 0 0, transparent 5px, black 5.5px),
+      radial-gradient(circle 5px at 100% 0, transparent 5px, black 5.5px),
+      radial-gradient(circle 5px at 0 100%, transparent 5px, black 5.5px),
+      radial-gradient(circle 5px at 100% 100%, transparent 5px, black 5.5px);
+  }
+
+  .stamp .stamp-name{
+    display:block;
+    font-family:var(--serif-sc);
+    font-weight:500;
+    font-size:12.5px;
+    letter-spacing:.04em;
+    margin-bottom:6px;
+    color:var(--clay-600);
+  }
+
+  .stamp .stamp-msg{
+    display:block;
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--ink-700);
+    word-break:break-word;
+  }
+
+  @keyframes stampIn{
+    from{
+      opacity:0;
+      transform:translateX(-40px) rotate(var(--rot));
+    }
+    to{
+      opacity:1;
+      transform:translateX(0) rotate(var(--rot));
+    }
+  }
+
   /* ---------- FOOTER ---------- */
   footer{
     background:var(--cream-100);
@@ -781,6 +855,9 @@
 
     </form>
 
+    <div class="wishes-wall" id="wishesWall"></div>
+    <p class="wishes-empty" id="wishesEmpty">Hãy là người đầu tiên gửi lời chúc!</p>
+
   </div>
 </section>
 
@@ -845,12 +922,77 @@
   setInterval(tick, 1000);
 
 
-  // Gửi lời chúc — mở email client của khách với nội dung đã điền sẵn,
-  // gửi tới nguyenanhvucvv@gmail.com. Trang tĩnh không có máy chủ riêng
-  // nên đây là cách gửi thư đáng tin cậy nhất mà không cần dịch vụ ngoài.
+  // Tường lời chúc — lưu mỗi lời chúc thành một "con tem" vĩnh viễn trên
+  // Firebase Realtime Database (miễn phí), không cần gửi qua Gmail.
+  //
+  // Cách kích hoạt (miễn phí, ~5 phút):
+  // 1. Vào https://console.firebase.google.com → Tạo dự án mới (Add project)
+  // 2. Trong dự án → Build → Realtime Database → Create Database
+  //    (chọn chế độ "Start in test mode" để bắt đầu nhanh)
+  // 3. Vào Project settings (biểu tượng bánh răng) → General → cuộn xuống
+  //    "Your apps" → bấm biểu tượng </> để tạo Web app → copy object
+  //    firebaseConfig hiện ra
+  // 4. Dán object đó thay cho FIREBASE_CONFIG bên dưới
+  // 5. (Khuyên dùng) Trong Realtime Database → Rules, giới hạn lại thành:
+  //      { "rules": { "wishes": { ".read": true, ".write": true } } }
+  //    để chỉ mục "wishes" công khai, phần còn lại được khoá.
+  //
+  // Lưu ý: nếu bạn đang xem qua bản xem trước của claude.ai, trình duyệt có
+  // thể chặn kết nối tới Firebase do chính sách bảo mật của claude.ai.
+  // Khi bạn tải file này lên website riêng của mình (GitHub Pages, v.v.),
+  // phần lưu trữ sẽ hoạt động đầy đủ và vĩnh viễn cho mọi khách truy cập.
+
+  const FIREBASE_CONFIG = {
+    apiKey: 'AIzaSyDrvDSXMpGqFvivC8z6ES3TVHpNSaMF23s',
+    databaseURL: 'https://data-5f418-default-rtdb.firebaseio.com',
+    projectId: 'data-5f418'
+  };
+
   const form = document.getElementById('rsvpForm');
   const status = document.getElementById('formStatus');
-  const RSVP_EMAIL = 'nguyenanhvucvv@gmail.com';
+  const wall = document.getElementById('wishesWall');
+  const emptyMsg = document.getElementById('wishesEmpty');
+
+  const firebaseReady = !FIREBASE_CONFIG.apiKey.startsWith('REPLACE_')
+    && typeof firebase !== 'undefined';
+
+  let wishesRef = null;
+
+  if (firebaseReady){
+    firebase.initializeApp(FIREBASE_CONFIG);
+    wishesRef = firebase.database().ref('wishes');
+  }
+
+  function addStamp(name, message){
+    emptyMsg.style.display = 'none';
+
+    const rot = (Math.random() * 8 - 4).toFixed(1);
+
+    const el = document.createElement('div');
+    el.className = 'stamp';
+    el.style.setProperty('--rot', rot + 'deg');
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'stamp-name';
+    nameEl.textContent = name;
+
+    const msgEl = document.createElement('span');
+    msgEl.className = 'stamp-msg';
+    msgEl.textContent = message || '💌';
+
+    el.appendChild(nameEl);
+    el.appendChild(msgEl);
+    wall.appendChild(el);
+  }
+
+  if (wishesRef){
+    wishesRef
+      .orderByChild('time')
+      .on('child_added', (snap) => {
+        const w = snap.val();
+        addStamp(w.name, w.message);
+      });
+  }
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -864,20 +1006,26 @@
       return;
     }
 
-    const subject = `Lời chúc đám cưới từ ${name}`;
-    const body =
-      `Họ và tên: ${name}\n` +
-      `Lời chúc: ${message || '(không có)'}`;
+    if (!firebaseReady){
+      status.textContent = 'Demo: chưa kết nối lưu trữ. Xem hướng dẫn trong mã nguồn để kích hoạt.';
+      status.style.color = '#d7b781';
+      addStamp(name, message);
+      form.reset();
+      return;
+    }
 
-    const mailtoLink =
-      `mailto:${RSVP_EMAIL}` +
-      `?subject=${encodeURIComponent(subject)}` +
-      `&body=${encodeURIComponent(body)}`;
+    status.textContent = 'Đang lưu...';
 
-    window.location.href = mailtoLink;
-
-    status.textContent = 'Đang mở ứng dụng email của bạn để gửi lời chúc...';
-    status.style.color = '#d7b781';
+    wishesRef.push({ name, message, time: Date.now() })
+      .then(() => {
+        status.textContent = 'Cảm ơn bạn! Lời chúc đã được lưu lại.';
+        status.style.color = '#d7b781';
+        form.reset();
+      })
+      .catch(() => {
+        status.textContent = 'Có lỗi xảy ra, vui lòng thử lại sau.';
+        status.style.color = '#e0a0a0';
+      });
   });
 
 </script>
