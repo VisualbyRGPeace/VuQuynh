@@ -588,6 +588,7 @@
     color:var(--ink-900);
     border:1px solid rgba(178,138,82,.4);
     box-shadow:0 6px 16px rgba(0,0,0,.22);
+    text-align:center;
     transform:rotate(var(--rot));
     animation:stampIn .6s cubic-bezier(.2,.7,.3,1) both;
     -webkit-mask-image:
@@ -623,7 +624,7 @@
   @keyframes stampIn{
     from{
       opacity:0;
-      transform:translateX(-40px) rotate(var(--rot));
+      transform:translateX(40px) rotate(var(--rot));
     }
     to{
       opacity:1;
