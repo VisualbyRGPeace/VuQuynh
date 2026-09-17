@@ -662,11 +662,15 @@
   }
 
   .monogram{
-    font-family:var(--script);
-    font-weight:normal;
-    font-size:38px;
-    color:var(--clay-600);
-    margin:0 0 10px;
+    width:min(46vw, 160px);
+    margin:0 auto 10px;
+  }
+
+  .monogram img{
+    display:block;
+    width:100%;
+    height:auto;
+    margin:0 auto;
   }
 
   footer .names{
@@ -887,7 +891,9 @@
 
 <!-- ===================== FOOTER ===================== -->
 <footer>
-  <p class="monogram">V &amp; Q</p>
+  <div class="monogram">
+    <img src="./logovq.png" alt="Vũ Nguyễn &amp; Như Quỳnh">
+  </div>
   <p class="names">VŨ NGUYỄN &amp; NHƯ QUỲNH<br>15.01.2027</p>
   <p class="legal">Made with love for our wedding day</p>
 </footer>
