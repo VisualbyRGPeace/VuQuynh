@@ -581,16 +581,18 @@
 
   .stamp{
     --rot:0deg;
+    --delay:0s;
     position:relative;
     width:150px;
-    padding:16px 14px 14px;
+    padding:20px 14px 14px;
     background:var(--cream-100);
     color:var(--ink-900);
     border:1px solid rgba(178,138,82,.4);
     box-shadow:0 6px 16px rgba(0,0,0,.22);
     text-align:center;
     transform:rotate(var(--rot));
-    animation:stampIn .6s cubic-bezier(.2,.7,.3,1) both;
+    animation:stampDrop .7s cubic-bezier(.28,1.55,.5,1) var(--delay) both;
+    transition:transform .3s ease, box-shadow .3s ease;
     -webkit-mask-image:
       radial-gradient(circle 5px at 0 0, transparent 5px, black 5.5px),
       radial-gradient(circle 5px at 100% 0, transparent 5px, black 5.5px),
@@ -601,6 +603,38 @@
       radial-gradient(circle 5px at 100% 0, transparent 5px, black 5.5px),
       radial-gradient(circle 5px at 0 100%, transparent 5px, black 5.5px),
       radial-gradient(circle 5px at 100% 100%, transparent 5px, black 5.5px);
+  }
+
+  .stamp:hover,
+  .stamp:focus-within{
+    transform:rotate(0deg) translateY(-6px) scale(1.04);
+    box-shadow:0 14px 26px rgba(0,0,0,.28);
+    z-index:2;
+  }
+
+  .stamp::before{
+    content:"";
+    position:absolute;
+    top:-7px;
+    left:50%;
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #e8c99a, var(--clay-600) 75%);
+    box-shadow:0 2px 4px rgba(0,0,0,.35);
+    transform:translateX(-50%) scale(0);
+    animation:pinPop .4s ease calc(var(--delay) + .45s) both;
+  }
+
+  .stamp::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border:1.5px solid var(--gold-500);
+    opacity:0;
+    transform:scale(.7);
+    pointer-events:none;
+    animation:sealRipple .6s ease-out calc(var(--delay) + .55s) both;
   }
 
   .stamp .stamp-name{
@@ -621,15 +655,48 @@
     word-break:break-word;
   }
 
-  @keyframes stampIn{
-    from{
+  .stamp .stamp-date{
+    display:block;
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px dashed rgba(178,138,82,.45);
+    font-family:var(--serif-sc);
+    font-size:9.5px;
+    letter-spacing:.08em;
+    color:var(--gold-500);
+  }
+
+  @keyframes stampDrop{
+    0%{
       opacity:0;
-      transform:translateX(40px) rotate(var(--rot));
+      transform:translateY(-46px) scale(.4) rotate(calc(var(--rot) - 14deg));
     }
-    to{
+    55%{
       opacity:1;
-      transform:translateX(0) rotate(var(--rot));
+      transform:translateY(4px) scale(1.08) rotate(calc(var(--rot) + 4deg));
     }
+    75%{
+      transform:translateY(-2px) scale(.98) rotate(calc(var(--rot) - 2deg));
+    }
+    100%{
+      opacity:1;
+      transform:translateY(0) scale(1) rotate(var(--rot));
+    }
+  }
+
+  @keyframes pinPop{
+    0%{ transform:translateX(-50%) scale(0); }
+    60%{ transform:translateX(-50%) scale(1.3); }
+    100%{ transform:translateX(-50%) scale(1); }
+  }
+
+  @keyframes sealRipple{
+    0%{ opacity:.55; transform:scale(.7); }
+    100%{ opacity:0; transform:scale(1.18); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .stamp, .stamp::before, .stamp::after{ animation:none !important; }
   }
 
   /* ---------- FOOTER ---------- */
@@ -964,14 +1031,32 @@
     wishesRef = firebase.database().ref('wishes');
   }
 
-  function addStamp(name, message){
+  let stampCount = 0;
+
+  function formatWishTime(ts){
+    if (!ts) return '';
+    const d = new Date(ts);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${dd}/${mm}/${yyyy} · ${hh}:${min}`;
+  }
+
+  function addStamp(name, message, time){
     emptyMsg.style.display = 'none';
 
     const rot = (Math.random() * 8 - 4).toFixed(1);
+    // Cascade stamps in one after another instead of popping in all at once,
+    // capped so a long list doesn't leave the last ones waiting too long.
+    const delay = Math.min(stampCount * 0.08, 0.8);
+    stampCount++;
 
     const el = document.createElement('div');
     el.className = 'stamp';
     el.style.setProperty('--rot', rot + 'deg');
+    el.style.setProperty('--delay', delay + 's');
 
     const nameEl = document.createElement('span');
     nameEl.className = 'stamp-name';
@@ -983,6 +1068,13 @@
 
     el.appendChild(nameEl);
     el.appendChild(msgEl);
+
+    const ts = time || Date.now();
+    const dateEl = document.createElement('span');
+    dateEl.className = 'stamp-date';
+    dateEl.textContent = formatWishTime(ts);
+    el.appendChild(dateEl);
+
     wall.appendChild(el);
   }
 
@@ -991,7 +1083,7 @@
       .orderByChild('time')
       .on('child_added', (snap) => {
         const w = snap.val();
-        addStamp(w.name, w.message);
+        addStamp(w.name, w.message, w.time);
       });
   }
 
