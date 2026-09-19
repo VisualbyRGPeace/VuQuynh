@@ -728,7 +728,7 @@
   .album-glow i.on{ opacity:1; }
 
   .album .section-inner{ position:relative; z-index:1; }
-  .album .heading{ margin-bottom:6px; }
+  .album .kicker{ margin-bottom:10px; }
 
   .deck-wrap{
     margin:0 -24px;          /* để thẻ ghost hai bên không bị cắt sát mép màn hình */
@@ -778,7 +778,8 @@
     transition:
       transform .85s cubic-bezier(.22,1,.36,1),
       opacity .6s ease,
-      filter .6s ease;
+      filter .6s ease,
+      visibility 0s;
   }
 
   /* 5 trạng thái vị trí — JS chỉ đổi data-pos, mọi chuyển động do CSS lo */
@@ -818,11 +819,17 @@
     opacity:0;
     z-index:1;
     pointer-events:none;
+    visibility:hidden;              /* thẻ ở xa không cần vẽ (nhẹ máy khi có nhiều ảnh) */
+    will-change:auto;
     transition:
       transform .85s cubic-bezier(.22,1,.36,1),
       opacity .3s ease,
-      filter .6s ease;
+      filter .6s ease,
+      visibility 0s linear .85s;
   }
+
+  /* ảnh không tải được sẽ bị loại khỏi vòng lướt */
+  .pcard[data-pos="gone"]{ display:none; }
 
   /* thẻ đang bay ra/vào luôn nằm trên cùng trong lúc chuyển */
   .pcard.raise{ z-index:40 !important; }
@@ -958,7 +965,7 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:22px;
+    gap:34px;
     margin-top:2px;
   }
 
@@ -982,16 +989,6 @@
     border-color:var(--ink-900);
     color:var(--cream-100);
     outline:none;
-  }
-
-  .deck-count{
-    min-width:74px;
-    text-align:center;
-    font-family:var(--serif-sc);
-    font-size:13px;
-    letter-spacing:.18em;
-    color:var(--ink-700);
-    font-variant-numeric:tabular-nums;
   }
 
   /* --- xem ảnh lớn (lightbox) --- */
@@ -1180,7 +1177,6 @@
   <div class="section-inner wide">
 
     <p class="kicker">Khoảnh khắc yêu thương</p>
-    <h2 class="heading">Album</h2>
 
     <div class="deck-wrap" id="deckWrap" tabindex="0" role="region"
          aria-roledescription="carousel"
@@ -1192,7 +1188,6 @@
       <button class="deck-btn" id="deckPrev" type="button" aria-label="Ảnh trước">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
       </button>
-      <span class="deck-count" id="deckCount">01 / 01</span>
       <button class="deck-btn" id="deckNext" type="button" aria-label="Ảnh sau">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
       </button>
@@ -1535,49 +1530,95 @@
 /* =====================================================================
    ALBUM ẢNH — thẻ xếp chồng tự chạy
    ---------------------------------------------------------------------
-   CÁCH THÊM ẢNH: chỉ cần sửa danh sách ALBUM_PHOTOS ngay bên dưới.
-   Mỗi ảnh là một dòng { ... }, thêm bớt tuỳ ý (nên có từ 4 ảnh trở lên).
+   CÁCH GÁN ẢNH: thay từng dòng trong PHOTO_LINKS bằng link ảnh của bạn.
+   Có sẵn 40 ô, thêm hoặc bớt dòng tuỳ ý (nên từ 4 ảnh trở lên).
 
-     src      Link ảnh (bắt buộc). Để trống '' thì hiện khung "Ảnh của bạn".
-              Dùng được: link trực tiếp tới file ảnh (.jpg .png .webp),
-              hoặc đường dẫn file trong cùng thư mục web, ví dụ './photos/01.jpg'
-     title    Tiêu đề in trên thẻ
-     tag      Nhãn nhỏ hình viên thuốc nằm dưới ảnh (để '' nếu không cần)
-     caption  Mô tả ngắn 1–3 dòng dưới ảnh (để '' nếu không cần)
-     pos      (tuỳ chọn) Điểm giữ lại khi ảnh bị cắt, ví dụ '50% 20%' = lấy phần
-              phía trên (hợp với ảnh chân dung để không cắt mất mặt)
-     accent   (tuỳ chọn) Màu vầng sáng nền, ví dụ '#b28a52'. Bỏ trống thì
-              tự lấy theo tông màu của ảnh.
+   Link dùng được:
+     • Đường dẫn tới file trong cùng thư mục web, ví dụ './photos/01.jpg'
+       (cách chắc nhất: bỏ ảnh vào thư mục "photos" cạnh index.html)
+     • Link trực tiếp tới file ảnh (.jpg .png .webp), ví dụ
+       'https://i.imgur.com/abc123.jpg'
+   Ô nào để trống '' sẽ hiện khung "Ảnh của bạn tại đây".
+   Ảnh nào không tải được sẽ tự động bị bỏ qua, không làm hỏng vòng lướt.
    ===================================================================== */
 (function(){
 
-  const ALBUM_PHOTOS = [
-    { src:'', title:'Khoảnh khắc 01', tag:'Vũ & Quỳnh', caption:'', pos:'50% 30%' },
-    { src:'', title:'Khoảnh khắc 02', tag:'Vũ & Quỳnh', caption:'', pos:'50% 30%' },
-    { src:'', title:'Khoảnh khắc 03', tag:'Vũ & Quỳnh', caption:'', pos:'50% 30%' },
-    { src:'', title:'Khoảnh khắc 04', tag:'Vũ & Quỳnh', caption:'', pos:'50% 30%' },
-    { src:'', title:'Khoảnh khắc 05', tag:'Vũ & Quỳnh', caption:'', pos:'50% 30%' },
-    { src:'', title:'Khoảnh khắc 06', tag:'Vũ & Quỳnh', caption:'', pos:'50% 30%' }
+  const PHOTO_LINKS = [
+    './photos/01.jpg',
+    './photos/02.jpg',
+    './photos/03.jpg',
+    './photos/04.jpg',
+    './photos/05.jpg',
+    './photos/06.jpg',
+    './photos/07.jpg',
+    './photos/08.jpg',
+    './photos/09.jpg',
+    './photos/10.jpg',
+    './photos/11.jpg',
+    './photos/12.jpg',
+    './photos/13.jpg',
+    './photos/14.jpg',
+    './photos/15.jpg',
+    './photos/16.jpg',
+    './photos/17.jpg',
+    './photos/18.jpg',
+    './photos/19.jpg',
+    './photos/20.jpg',
+    './photos/21.jpg',
+    './photos/22.jpg',
+    './photos/23.jpg',
+    './photos/24.jpg',
+    './photos/25.jpg',
+    './photos/26.jpg',
+    './photos/27.jpg',
+    './photos/28.jpg',
+    './photos/29.jpg',
+    './photos/30.jpg',
+    './photos/31.jpg',
+    './photos/32.jpg',
+    './photos/33.jpg',
+    './photos/34.jpg',
+    './photos/35.jpg',
+    './photos/36.jpg',
+    './photos/37.jpg',
+    './photos/38.jpg',
+    './photos/39.jpg',
+    './photos/40.jpg'
   ];
+
+  // Chữ mặc định in trên mọi thẻ (để '' nếu không muốn hiện)
+  const DEFAULT_TITLE = 'Vũ & Quỳnh';
+  const DEFAULT_TAG   = '15 . 01 . 2027';
+
+  // (Tuỳ chọn) Riêng cho từng ảnh — số là thứ tự ảnh trong danh sách trên (bắt đầu từ 1).
+  //   title    tiêu đề    tag     nhãn nhỏ dưới ảnh    caption   mô tả 1–3 dòng
+  //   pos      điểm giữ lại khi ảnh bị cắt, '50% 20%' = ưu tiên phần phía trên (giữ mặt người)
+  //   accent   màu vầng sáng nền, ví dụ '#b28a52' (bỏ trống = tự lấy theo màu ảnh)
+  // Ví dụ (xoá dấu // ở đầu dòng để dùng):
+  const PHOTO_DETAILS = {
+    // 1:  { title:'Ngày đầu gặp nhau', tag:'Đà Lạt · 2023', caption:'Một buổi chiều rất bình thường.' },
+    // 12: { title:'Lời cầu hôn', pos:'50% 15%' },
+  };
 
   const AUTOPLAY_MS = 3000;   // thời gian giữa hai lần tự chuyển ảnh (mili giây)
 
 
   /* ---------------------- phần dưới không cần sửa ---------------------- */
 
-  const photos  = ALBUM_PHOTOS;
+  const photos = PHOTO_LINKS.map((src, i) => Object.assign(
+    { src, title:DEFAULT_TITLE, tag:DEFAULT_TAG, caption:'', pos:'50% 30%' },
+    PHOTO_DETAILS[i + 1] || {}
+  ));
   const N       = photos.length;
   const section = document.getElementById('album');
   const wrap    = document.getElementById('deckWrap');
   const deck    = document.getElementById('deck');
   const glowBox = document.getElementById('albumGlow');
-  const countEl = document.getElementById('deckCount');
   if (!section || !deck || !N) return;
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const DEFAULT_ACC  = [178, 138, 82];
 
-  const pad = n => String(n).padStart(2, '0');
   const lighten = c => c.map(v => Math.round(v + (255 - v) * 0.5));
 
   function hexToRgb(h){
@@ -1611,9 +1652,12 @@
   const SVG_ARROW = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>';
 
   /* ---------- dựng thẻ ---------- */
-  const cards = [];
-  const glows = [];
-  const failed = photos.map(p => !p.src);
+  const cards   = [];
+  const glows   = [];
+  const imgs    = [];                       // phần tử <img> của từng thẻ (null nếu chưa có ảnh)
+  const started = photos.map(() => false);  // đã bắt đầu tải ảnh chưa
+  const retried = photos.map(() => false);
+  const failed  = photos.map(() => false);
 
   function setAccent(i, c){
     cards[i].style.setProperty('--acc', c.join(','));
@@ -1621,33 +1665,27 @@
     glows[i].style.setProperty('--acc', c.join(','));
   }
 
-  // Lấy màu chủ đạo của ảnh. Nếu ảnh nằm ở máy chủ khác không cho phép đọc
-  // pixel thì bỏ qua và dùng màu vàng mặc định (ảnh vẫn hiển thị bình thường).
-  function sampleAccent(src, done){
-    const im = new Image();
-    im.crossOrigin = 'anonymous';
-    im.onload = function(){
-      try{
-        const S = 20;
-        const cv = document.createElement('canvas');
-        cv.width = cv.height = S;
-        const g = cv.getContext('2d', { willReadFrequently:true });
-        g.drawImage(im, 0, 0, S, S);
-        const d = g.getImageData(0, 0, S, S).data;
-        let r = 0, gr = 0, b = 0, w = 0;
-        for (let k = 0; k < d.length; k += 4){
-          const R = d[k], G = d[k+1], B = d[k+2];
-          const mx = Math.max(R,G,B), mn = Math.min(R,G,B);
-          const sat = mx ? (mx - mn) / mx : 0;
-          const lum = (R + G + B) / 765;
-          const wt = 0.05 + sat * sat * 1.5 + (lum > 0.15 && lum < 0.9 ? 0.1 : 0);
-          r += R * wt; gr += G * wt; b += B * wt; w += wt;
-        }
-        done(w ? [r / w, gr / w, b / w].map(Math.round) : null);
-      }catch(e){ done(null); }
-    };
-    im.onerror = () => done(null);
-    im.src = src;
+  // Lấy màu chủ đạo từ chính ảnh đang hiển thị (không tải thêm lần nữa).
+  // Nếu ảnh ở máy chủ khác không cho đọc pixel thì bỏ qua, dùng màu vàng mặc định.
+  function sampleFrom(im){
+    try{
+      const S = 20;
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = S;
+      const g = cv.getContext('2d', { willReadFrequently:true });
+      g.drawImage(im, 0, 0, S, S);
+      const d = g.getImageData(0, 0, S, S).data;
+      let r = 0, gr = 0, b = 0, w = 0;
+      for (let k = 0; k < d.length; k += 4){
+        const R = d[k], G = d[k+1], B = d[k+2];
+        const mx = Math.max(R,G,B), mn = Math.min(R,G,B);
+        const sat = mx ? (mx - mn) / mx : 0;
+        const lum = (R + G + B) / 765;
+        const wt = 0.05 + sat * sat * 1.5 + (lum > 0.15 && lum < 0.9 ? 0.1 : 0);
+        r += R * wt; gr += G * wt; b += B * wt; w += wt;
+      }
+      return w ? [r / w, gr / w, b / w].map(Math.round) : null;
+    }catch(e){ return null; }
   }
 
   photos.forEach((p, i) => {
@@ -1670,34 +1708,46 @@
     card.appendChild(top);
 
     // tiêu đề
-    const title = document.createElement('div');
-    title.className = 'pcard-title';
-    title.textContent = p.title || '';
-    card.appendChild(title);
+    if (p.title){
+      const title = document.createElement('div');
+      title.className = 'pcard-title';
+      title.textContent = p.title;
+      card.appendChild(title);
+    }
 
-    // ảnh
+    // ảnh (chỉ gắn link khi gần tới lượt — xem loadImg)
     const fig = document.createElement('figure');
     fig.className = 'pcard-photo';
     if (p.pos) fig.style.setProperty('--pos', p.pos);
 
+    let img = null;
     if (p.src){
-      const img = document.createElement('img');
+      img = document.createElement('img');
       img.alt = p.title || 'Ảnh cưới';
       img.decoding = 'async';
-      img.loading = i < 3 ? 'eager' : 'lazy';
       img.draggable = false;
-      img.addEventListener('error', () => {
-        failed[i] = true;
-        img.remove();
-        fig.classList.add('empty');
-        fig.dataset.label = 'Không tải được ảnh ' + (i + 1);
+      img.addEventListener('load', () => {
+        if (img.crossOrigin && !photos[i].accent){       // còn ở chế độ đọc được pixel
+          const rgb = sampleFrom(img);
+          if (rgb) setAccent(i, vivid(rgb));
+        }
       });
-      img.src = p.src;
+      img.addEventListener('error', () => {
+        if (img.crossOrigin && !retried[i]){
+          // máy chủ không cho đọc màu → thử lại kiểu thường để vẫn hiện được ảnh
+          retried[i] = true;
+          img.removeAttribute('crossorigin');
+          img.src = p.src;
+        } else {
+          markFailed(i);
+        }
+      });
       fig.appendChild(img);
     } else {
       fig.classList.add('empty');
       fig.dataset.label = 'Ảnh của bạn tại đây';
     }
+    imgs.push(img);
 
     if (p.tag){
       const pill = document.createElement('span');
@@ -1724,22 +1774,55 @@
     glows.push(glow);
 
     // màu: ưu tiên "accent" tự đặt, không thì lấy theo ảnh, không được thì màu vàng
-    const manual = hexToRgb(p.accent);
-    if (manual) setAccent(i, manual);
-    else {
-      setAccent(i, DEFAULT_ACC);
-      if (p.src) sampleAccent(p.src, rgb => { if (rgb) setAccent(i, vivid(rgb)); });
-    }
+    setAccent(i, hexToRgb(p.accent) || DEFAULT_ACC);
   });
 
-  /* ---------- trạng thái & chuyển ảnh ---------- */
+  /* ---------- vòng lướt: chỉ gồm những thẻ còn dùng được ---------- */
+  let order = photos.map((_, i) => i);
   let cur = 0;
+  let near = false;                       // đã cuộn gần tới mục Album chưa
+
+  function loadImg(i){
+    if (started[i] || !imgs[i]) return;
+    started[i] = true;
+    imgs[i].crossOrigin = 'anonymous';
+    imgs[i].src = photos[i].src;
+  }
+
+  // Chỉ tải vài ảnh quanh thẻ hiện tại → 40 ảnh cũng không làm nặng trang
+  function preload(){
+    if (!near) return;
+    const M = order.length, k = order.indexOf(cur);
+    for (let d = -1; d <= 4; d++) loadImg(order[(k + d + M) % M]);
+  }
+
+  function markFailed(i){
+    if (failed[i]) return;
+    failed[i] = true;
+    if (imgs[i]) imgs[i].remove();
+    const fig = cards[i].querySelector('.pcard-photo');
+    fig.classList.add('empty');
+    fig.dataset.label = 'Không tải được ảnh';
+
+    const k = order.indexOf(i);
+    if (k < 0) return;
+    order.splice(k, 1);
+    if (!order.length){
+      // không ảnh nào tải được (chưa gán link/chưa tải ảnh lên): hiện vài khung mẫu
+      order = photos.map((_, j) => j).slice(0, Math.min(6, N));
+      order.forEach(j => { cards[j].querySelector('.pcard-photo').dataset.label = 'Ảnh của bạn tại đây'; });
+    }
+    if (order.indexOf(cur) < 0) cur = order[k % order.length];
+    render(0, null);
+  }
 
   function posOf(i){
-    const rel = (i - cur + N) % N;
+    const M = order.length, r = order.indexOf(i);
+    if (r < 0) return 'gone';
+    const rel = (r - order.indexOf(cur) + M) % M;
     if (rel === 0) return 'front';
     if (rel === 1) return 'next';
-    if (N > 2 && rel === N - 1) return 'prev';
+    if (M > 2 && rel === M - 1) return 'prev';
     if (rel === 2) return 'next2';
     return 'hidden';
   }
@@ -1759,15 +1842,15 @@
       el.setAttribute('aria-hidden', pos === 'front' ? 'false' : 'true');
     });
     glows.forEach((g, i) => g.classList.toggle('on', i === cur));
-    countEl.textContent = pad(cur + 1) + ' / ' + pad(N);
+    preload();
 
     if (dir > 0 && oldCur != null) raise(cards[oldCur]);   // thẻ cũ bay xuống, nằm trên thẻ mới
     if (dir < 0) raise(cards[cur]);                        // thẻ quay lại bay lên, nằm trên cùng
   }
 
   function go(dir){
-    const old = cur;
-    cur = (cur + dir + N) % N;
+    const old = cur, M = order.length;
+    cur = order[(order.indexOf(cur) + dir + M) % M];
     render(dir, old);
     schedule();
   }
@@ -1777,7 +1860,7 @@
   const lb = document.getElementById('lb');
 
   function canAuto(){
-    return !reduceMotion && N > 1 && inView && !hovering && !focused && !dragging
+    return !reduceMotion && order.length > 1 && inView && !hovering && !focused && !dragging
         && !document.hidden && !lb.classList.contains('open');
   }
 
@@ -1792,8 +1875,12 @@
       inView = entries[0].isIntersecting;
       schedule();
     }, { threshold: 0.35 }).observe(section);
+
+    new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !near){ near = true; preload(); }
+    }, { rootMargin: '900px 0px' }).observe(section);
   } else {
-    inView = true;
+    inView = true; near = true;
   }
 
   document.addEventListener('visibilitychange', schedule);
@@ -1888,7 +1975,7 @@
 
   function openLightbox(i){
     if (!photos[i].src || failed[i]) return;
-    if (i !== cur){ const d = i > cur ? 1 : -1; cur = i; render(d, null); }
+    if (i !== cur){ const d = order.indexOf(i) > order.indexOf(cur) ? 1 : -1; cur = i; render(d, null); }
     lastFocus = document.activeElement;
     fillLb();
     lb.classList.add('open');
@@ -1909,7 +1996,7 @@
 
   function stepLb(dir){
     // bỏ qua những thẻ chưa có ảnh
-    for (let k = 0; k < N; k++){
+    for (let k = 0; k < order.length; k++){
       go(dir);
       if (photos[cur].src && !failed[cur]) break;
     }
