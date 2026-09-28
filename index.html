@@ -2038,6 +2038,15 @@
     else if (!userPaused && !audio.paused === false && btn.classList.contains('playing')) audio.play().catch(()=>{});
   });
 
+  // Báo lỗi trực tiếp trên màn hình nếu không tải được file nhạc
+  audio.addEventListener('error', () => {
+    const t = document.createElement('div');
+    t.textContent = 'Không tải được file nhạc: ' + audio.getAttribute('src') + ' (kiểm tra tên và vị trí file trên GitHub)';
+    t.style.cssText = 'position:fixed;left:12px;right:70px;bottom:16px;z-index:300;background:#5a1d1d;color:#fff;padding:10px 14px;border-radius:10px;font:14px/1.4 sans-serif;';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 15000);
+  });
+
   setUI(false);
   tryPlay();   // thử tự phát ngay khi tải trang
 })();
