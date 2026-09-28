@@ -1046,7 +1046,30 @@
   .music-btn.muted .ic-off{ display:block; }
   .music-btn.muted{ animation:none; }
   @keyframes musicSpin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- MÀN HÌNH MỞ THIỆP ---------- */
+  .cover{
+    position:fixed; inset:0; z-index:1000;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:24px;
+    background:var(--pine-900, #22362c); color:var(--cream-100);
+    transition:opacity .9s ease, visibility .9s ease;
+  }
+  .cover.hide{ opacity:0; visibility:hidden; pointer-events:none; }
+  .cover .c-small{ font-family:var(--serif-sc); letter-spacing:.35em; font-size:13px; color:var(--gold-300); margin:0 0 18px; }
+  .cover .c-names{ font-family:var(--script); font-size:clamp(40px,11vw,68px); line-height:1.15; margin:0; color:var(--cream-100); }
+  .cover .c-date{ font-family:var(--serif); letter-spacing:.3em; font-size:15px; margin:18px 0 38px; color:var(--gold-300); }
+  .cover button{
+    font-family:var(--serif-sc); letter-spacing:.25em; font-size:14px;
+    padding:14px 34px; border-radius:999px; cursor:pointer;
+    background:transparent; color:var(--gold-300);
+    border:1px solid var(--gold-300);
+    animation:coverPulse 2s ease-in-out infinite;
+  }
+  .cover button:hover{ background:var(--gold-300); color:var(--pine-900, #22362c); }
+  @keyframes coverPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(215,183,129,.45);} 50%{ box-shadow:0 0 0 12px rgba(215,183,129,0);} }
 </style>
+
 
 </head>
 
@@ -2036,7 +2059,7 @@
     return audio.play().then(() => { setUI(true); removeUnlock(); })
                        .catch(() => setUI(false));
   }
-  const evts = ['pointerdown','touchstart','click','keydown','scroll','wheel'];
+  const evts = ['pointerdown','pointerup','touchstart','touchend','mousedown','click','keydown','scroll','wheel'];
   function unlock(e){
     if (e.target === btn || btn.contains(e.target)) return;
     tryPlay();
@@ -2065,7 +2088,11 @@
   });
 
   setUI(false);
-  tryPlay();   // thử tự phát ngay khi tải trang
+  tryPlay();   // thử tự phát ngay khi mở trang
+  audio.addEventListener('canplay', tryPlay, { once:true });
+  window.addEventListener('DOMContentLoaded', tryPlay);
+  window.addEventListener('load', tryPlay);
+  window.addEventListener('pageshow', tryPlay);   // thử tự phát ngay khi tải trang
 })();
 </script>
 
