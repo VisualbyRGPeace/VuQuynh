@@ -1017,15 +1017,26 @@
 
 
   /* ---------- NHẠC NỀN ---------- */
-  .music-btn{
-    position:fixed; right:16px; bottom:16px; z-index:200;
-    width:46px; height:46px; border-radius:50%;
-    border:1px solid rgba(215,183,129,.7);
-    background:rgba(30,22,16,.75); color:#d7b781;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; backdrop-filter:blur(6px);
+  .music-player{
+    position:fixed; right:14px; bottom:14px; z-index:200;
+    display:flex; align-items:center; gap:10px;
+    max-width:calc(100vw - 28px);
+    padding:6px 16px 6px 6px; border-radius:999px;
+    background:rgba(30,22,16,.78);
+    border:1px solid rgba(215,183,129,.55);
+    backdrop-filter:blur(6px);
     box-shadow:0 4px 14px rgba(0,0,0,.3);
-    padding:0; transition:transform .2s;
+  }
+  .music-info{ display:flex; flex-direction:column; line-height:1.25; min-width:0; }
+  .music-title{ color:#d7b781; font:600 14px/1.25 'Cormorant','Georgia',serif; letter-spacing:.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .music-artist{ color:rgba(255,255,255,.7); font:12px/1.25 'Cormorant','Georgia',serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .music-btn{
+    flex:0 0 auto;
+    width:40px; height:40px; border-radius:50%;
+    border:1px solid rgba(215,183,129,.7);
+    background:rgba(0,0,0,.25); color:#d7b781;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; padding:0; transition:transform .2s;
   }
   .music-btn:hover{ transform:scale(1.08); }
   .music-btn svg{ width:20px; height:20px; fill:currentColor; }
@@ -1992,10 +2003,16 @@
 
 <!-- NHẠC NỀN -->
 <audio id="bgm" src="./audio01.mp3" loop preload="auto" playsinline></audio>
-<button class="music-btn" id="musicBtn" type="button" aria-label="Bật/tắt nhạc">
+<div class="music-player">
+  <button class="music-btn" id="musicBtn" type="button" aria-label="Bật/tắt nhạc">
   <svg class="ic-on" viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3z"/></svg>
   <svg class="ic-off" viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3z" opacity=".5"/><path d="M3 4.3 4.3 3 21 19.7 19.7 21z"/></svg>
 </button>
+  <div class="music-info">
+    <span class="music-title">Để Cho Anh</span>
+    <span class="music-artist">Vũ Nguyễn</span>
+  </div>
+</div>
 
 <script>
 /* =====================================================================
@@ -2042,7 +2059,7 @@
   audio.addEventListener('error', () => {
     const t = document.createElement('div');
     t.textContent = 'Không tải được file nhạc: ' + audio.getAttribute('src') + ' (kiểm tra tên và vị trí file trên GitHub)';
-    t.style.cssText = 'position:fixed;left:12px;right:70px;bottom:16px;z-index:300;background:#5a1d1d;color:#fff;padding:10px 14px;border-radius:10px;font:14px/1.4 sans-serif;';
+    t.style.cssText = 'position:fixed;left:12px;right:12px;bottom:76px;z-index:300;background:#5a1d1d;color:#fff;padding:10px 14px;border-radius:10px;font:14px/1.4 sans-serif;';
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 15000);
   });
