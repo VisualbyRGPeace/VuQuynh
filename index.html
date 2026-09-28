@@ -1,2436 +1,2045 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Welcome To My Show</title>
+<title>Vũ Nguyễn &amp; Như Quỳnh — Thiệp cưới</title>
+<meta name="description" content="Thiệp mời cưới của Vũ Nguyễn &amp; Như Quỳnh — 15.01.2027">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+SC:wght@500;600&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="./logo.png">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
 <style>
+
+  /* ---------- SVN DARLESTON (thay bằng font thật của bạn nếu có) ---------- */
+  @font-face {
+    font-family: 'SVN-Darleston';
+    src: url('./SVN-Darleston.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ---------- GILROY MEDIUM (thay bằng font thật của bạn nếu có) ---------- */
+  @font-face {
+    font-family: 'Gilroy-Medium';
+    src: url('./GilroyMedium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root{
-    --bg:#07070b;
-    --bg-soft:#0d0d13;
-    --text:#f2f2f6;
-    --muted:#9797a3;
-    --hairline:rgba(255,255,255,0.08);
-    --c-violet:#8a6bff;
-    --c-cyan:#35d0ff;
-    --c-coral:#ff5b66;
-    --c-amber:#ffb238;
-    --c-mint:#39e3a6;
-    --c-rose:#ff6fc9;
-    --c-steel:#6f8bff;
-    --ease-lux:cubic-bezier(.16,1,.3,1); /* long, soft "expo-out" curve used by the project animations */
+    /* Bảng màu lấy cảm hứng từ rừng thông & cao nguyên Lâm Đồng */
+    --pine-900:#22362c;
+    --pine-800:#2c4437;
+    --pine-700:#3d5c49;
+    --clay-600:#a3603f;
+    --cream-100:#f8f2e6;
+    --cream-200:#efe3cd;
+    --gold-500:#b28a52;
+    --gold-300:#d7b781;
+    --ink-900:#251d16;
+    --ink-700:#4a392c;
+
+    --serif: 'Gilroy-Medium', 'Cormorant', 'Iowan Old Style', Georgia, serif;
+    --serif-sc: 'Gilroy-Medium', 'Cormorant SC', 'Cormorant', serif;
+    --script: 'SVN-Darleston', 'Dancing Script', cursive;
+
+    --shell: 1180px;
   }
 
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth; overflow-x:hidden; width:100%;}
+  html{scroll-behavior:smooth;}
+
   body{
     margin:0;
-    width:100%;
-    background:var(--bg);
-    color:var(--text);
-    font-family:'Inter', sans-serif;
+    font-family:var(--serif);
+    background:var(--cream-100);
+    color:var(--ink-900);
     -webkit-font-smoothing:antialiased;
-    -webkit-text-size-adjust:100%;
-    overflow-x:hidden;
   }
-  h1,h2,h3,.brand{
-    font-family:'Space Grotesk', sans-serif;
-  }
-  a{color:inherit;text-decoration:none;}
+
   img{max-width:100%;display:block;}
+  a{color:inherit;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{
+      animation-duration:0.01ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:0.01ms !important;
+      scroll-behavior:auto !important;
+    }
+  }
 
   /* ---------- NAV ---------- */
-  header{
+  .nav{
     position:fixed;
-    top:0; left:0; right:0;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    padding:28px 6vw;
-    z-index:50;
-    background:linear-gradient(to bottom, rgba(7,7,11,0.85), transparent);
-  }
-  nav{
-    display:flex;
-    gap:34px;
-    min-width:0;
-    overflow-x:auto;
-    -ms-overflow-style:none;
-    scrollbar-width:none;
-  }
-  nav::-webkit-scrollbar{display:none;}
-  nav a{
-    font-size:14px;
-    color:var(--muted);
-    letter-spacing:.02em;
-    transition:color .25s ease;
-    position:relative;
-    white-space:nowrap;
-  }
-  nav a:hover, nav a:focus-visible{color:var(--text);}
-  nav a::after{
-    content:'';
-    position:absolute; left:0; bottom:-6px;
-    width:0%; height:1px;
-    background:var(--text);
-    transition:width .25s ease;
-  }
-  nav a:hover::after{width:100%;}
-  .brand-mark{
-    font-size:13px;
-    color:var(--muted);
-    letter-spacing:.08em;
-    flex-shrink:0;
-  }
-
-  /* ---------- HERO / CIRCULAR GALLERY ---------- */
-  .hero{
-    position:relative;
-    min-height:100vh;
-    min-height:100svh; /* fixes mobile browsers where 100vh includes the address bar and cuts/jumps the layout */
-    padding:140px 20px 80px;
-    overflow:hidden; /* cards that rotate past the visible arc are hidden, not clipped abruptly mid-card */
-  }
-  /* Bottom fade: dissolves the lower cards into the background color
-     instead of ending on a hard clipped edge, and visually connects
-     the hero into the section below it. */
-  .hero::after{
-    content:'';
-    position:absolute;
-    left:0; right:0; bottom:0;
-    height:38%;
-    background:linear-gradient(to bottom, transparent, var(--bg) 80%);
-    pointer-events:none;
-    z-index:15;
-  }
-  /* .orbit is the "stage": a full-bleed layer whose coordinate system
-     is used to compute the circle in JS. The circle's center sits
-     BELOW this box (see the script); cards travel all the way around
-     that circle as one rigid ring, so only the upper portion is ever
-     visible — like the top of a slowly turning wheel. */
-  .orbit{
-    position:absolute;
-    inset:0;
-  }
-  /* Outer wrapper: POSITION + ROTATION only. Left/top/--angle are
-     rewritten every animation frame by the script, so this element
-     deliberately has NO transition — that keeps the continuous
-     rotation perfectly smooth instead of fighting a CSS transition. */
-  .orbit-card{
-    position:absolute;
-    top:0; left:0;
-    width:clamp(58px, 9.5vw, 104px);
-    aspect-ratio:1/1;
-    transform: translate(-50%,-50%) rotate(var(--angle,0deg));
-    cursor:pointer;
-  }
-  /* Inner layer: visuals + the hover/focus response only (scale + glow).
-     This is where a transition is safe, since it only ever changes on
-     hover/focus, never on every animation frame. */
-  /* Ambient glow: a blurred, oversized copy of the SAME photo, sitting
-     behind the card. This is what makes the glow look like it's coming
-     from the image itself instead of a flat colored light. */
-  .orbit-card-glow{
-    position:absolute;
-    top:50%; left:50%;
-    width:150%; height:150%;
-    transform:translate(-50%,-50%) scale(0.86);
-    background-size:cover;
-    background-position:center;
-    filter:blur(10px) saturate(1.3) brightness(1.05);
-    opacity:0;
-    border-radius:40%;
-    pointer-events:none;
-    transition:opacity .35s ease, transform .35s ease, filter .35s ease;
-    z-index:0;
-  }
-  .orbit-card-inner{
-    position:relative;
-    z-index:1;
-    width:100%; height:100%;
-    border-radius:18px;
-    overflow:hidden;
-    background:#15151d center/cover no-repeat;
-    transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, filter .35s ease;
-  }
-  .orbit-card-inner::after{
-    content:'';
-    position:absolute; inset:0;
-    background:linear-gradient(160deg, transparent 40%, rgba(0,0,0,.35));
-  }
-  .orbit-card img{
-    width:100%; height:100%; object-fit:cover;
-  }
-  .orbit-card:hover .orbit-card-glow,
-  .orbit-card:focus-visible .orbit-card-glow{
-    opacity:0.75;
-    transform:translate(-50%,-50%) scale(1);
-    filter:blur(12px) saturate(1.4) brightness(1.1);
-  }
-  .orbit-card:hover .orbit-card-inner,
-  .orbit-card:focus-visible .orbit-card-inner{
-    transform: scale(1.2);
-    filter:saturate(1.15);
-  }
-  .orbit-card:hover, .orbit-card:focus-visible{ z-index:20; }
-
-  .hero-content{
-    position:absolute;
-    top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    z-index:10;
-    text-align:center;
-    max-width:420px;
-    width:100%;
-    padding:0 16px;
-    pointer-events:none;
-  }
-  .hero-content .btn{ pointer-events:auto; }
-  .hero-content h1{
-    font-size:clamp(26px, 4.4vw, 40px);
-    font-weight:600;
-    margin:0 0 16px;
-    letter-spacing:-0.01em;
-  }
-  .hero-content p{
-    font-size:15px;
-    line-height:1.7;
-    color:var(--muted);
-    margin:0 0 30px;
-  }
-  .btn{
-    display:inline-block;
-    background:#fff;
-    color:#0a0a0d;
-    font-weight:600;
-    font-size:14px;
-    padding:13px 30px;
-    border-radius:999px;
-    transition:transform .25s ease, box-shadow .25s ease;
-  }
-  .btn:hover{
-    transform:translateY(-2px);
-    box-shadow:0 10px 30px rgba(255,255,255,.15);
-  }
-
-  /* ---------- ABOUT ---------- */
-  section{
-    padding:110px 6vw;
-    border-top:1px solid var(--hairline);
-  }
-  .section-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-    gap:40px;
-    margin-bottom:52px;
-    flex-wrap:wrap;
-  }
-  .section-head h2{
-    font-size:clamp(24px,3.4vw,34px);
-    font-weight:600;
-    margin:0;
-  }
-  .section-head .idx{
-    color:var(--muted);
-    font-size:14px;
-  }
-  .about-grid{
-    display:grid;
-    grid-template-columns:minmax(240px, 360px) 1fr;
-    gap:64px;
-    align-items:start;
-  }
-  .about-grid p{
-    font-size:16px;
-    line-height:1.8;
-    color:var(--muted);
-    max-width:60ch;
-    margin:0;
-  }
-
-  /* ---------- PORTRAIT (3:4, rounded) ----------
-     A frosted-blur band sweeps across the photo on a loop. The loop never
-     stops, but the band is only visible for the first ~half of each cycle,
-     so the effect shows up "every now and then" instead of being constant. */
-  .portrait{
-    position:relative;
-    margin:0;
-    width:100%;
-    aspect-ratio:3 / 4;
-    border-radius:22px;
-    overflow:hidden;
-    isolation:isolate;
-    background:linear-gradient(160deg, #1b1b28, #0d0d13);
-    border:1px solid var(--hairline);
-    box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 70px rgba(138,107,255,.10);
-  }
-  .portrait-ph{ /* placeholder text — sits under the photo, only visible if the photo is missing */
-    position:absolute; inset:0;
-    display:flex; align-items:center; justify-content:center;
-    color:rgba(255,255,255,.22);
-    font-size:13px;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-  }
-  .portrait img{
-    position:relative;
-    z-index:1;
-    width:100%; height:100%;
-    object-fit:cover;
-    display:block;
-    /* starts hidden + blurred, then "develops" once the photo has loaded */
-    opacity:0;
-    filter:blur(16px);
-    transform:scale(1.06);
-    transition:opacity 1.1s cubic-bezier(.33,0,.2,1), filter 1.3s cubic-bezier(.22,.75,.3,1), transform 1.8s var(--ease-lux);
-  }
-  .portrait img.is-loaded{
-    opacity:1;
-    filter:none;
-    transform:none;
-  }
-  .portrait-blur{
-    position:absolute; inset:0;
-    z-index:2;
-    pointer-events:none;
-    opacity:0;
-    -webkit-backdrop-filter:blur(16px) saturate(1.2);
-    backdrop-filter:blur(16px) saturate(1.2);
-    background:linear-gradient(115deg, rgba(138,107,255,.18), rgba(53,208,255,.10));
-    -webkit-mask-image:linear-gradient(115deg, transparent 30%, #000 50%, transparent 70%);
-    mask-image:linear-gradient(115deg, transparent 30%, #000 50%, transparent 70%);
-    -webkit-mask-size:300% 100%;
-    mask-size:300% 100%;
-    -webkit-mask-repeat:no-repeat;
-    mask-repeat:no-repeat;
-    -webkit-mask-position:0% 0;
-    mask-position:0% 0;
-    animation:portraitBlur 10s cubic-bezier(.45,.05,.25,1) infinite;
-  }
-  @keyframes portraitBlur{
-    0%   { opacity:0; -webkit-mask-position:0% 0;   mask-position:0% 0; }
-    10%  { opacity:1; }
-    42%  { opacity:1; }
-    52%  { opacity:0; -webkit-mask-position:100% 0; mask-position:100% 0; }
-    100% { opacity:0; -webkit-mask-position:100% 0; mask-position:100% 0; }
-  }
-  .portrait::after{ /* fine inner edge + soft bottom shade */
-    content:'';
-    position:absolute; inset:0;
-    z-index:3;
-    border-radius:inherit;
-    pointer-events:none;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), inset 0 -90px 70px -50px rgba(0,0,0,.35);
-  }
-
-  /* ---------- INFO ---------- */
-  .about-facts{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    column-gap:32px;
-    margin:32px 0 0;
-    padding:0;
-    border-bottom:1px solid var(--hairline);
-  }
-  .about-facts > div{
-    padding:16px 0;
-    border-top:1px solid var(--hairline);
-  }
-  .about-facts .wide{grid-column:1 / -1;}
-  .about-facts dt{
-    font-size:12px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    color:var(--muted);
-    margin-bottom:6px;
-  }
-  .about-facts dd{
-    margin:0;
-    font-size:16px;
-    font-weight:500;
-    color:var(--text);
-  }
-  .about-facts dd small{
-    display:block;
-    margin-top:2px;
-    font-size:14px;
-    font-weight:400;
-    color:var(--muted);
-  }
-  .edu-item + .edu-item{margin-top:12px;}
-
-  /* ---------- PARTNER LOGOS ROW ---------- */
-  .about-logos{
-    margin-top:32px;
-  }
-  .about-logos .logos-label{
-    display:block;
-    font-size:12px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    color:var(--muted);
-    margin-bottom:16px;
-  }
-  .logos-row{
-    display:flex;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:36px;
-  }
-  .logo-item{
-    position:relative;
-    display:inline-flex;
-  }
-  .logo-item img{
-    height:28px;
-    width:auto;
-    max-width:120px;
-    object-fit:contain;
-    filter:grayscale(1) brightness(1.8);
-    opacity:.55;
-    transition:opacity .25s ease, filter .25s ease;
-  }
-  .logo-item:hover img,
-  .logo-item:focus-visible img{
-    filter:none;
-    opacity:1;
-  }
-  /* Software icons (inline SVG): black & white by default, colour + lift on hover */
-  .logo-item svg{
-    display:block;
-    height:40px;
-    width:auto;
-    filter:grayscale(1) brightness(1.9);
-    opacity:.6;
-    transition:opacity .35s ease, filter .35s ease, transform .45s var(--ease-lux);
-  }
-  .logo-item:hover svg,
-  .logo-item:focus-visible svg{
-    filter:none;
-    opacity:1;
-    transform:translateY(-2px);
-  }
-  .logo-item:focus-visible{outline:none;}
-  /* Company-name tooltip — appears above the logo on hover */
-  .logo-item::after{
-    content:attr(data-name);
-    position:absolute;
-    left:50%; bottom:calc(100% + 10px);
-    transform:translate(-50%, 4px);
-    white-space:nowrap;
-    font-size:12px;
-    font-weight:500;
-    color:var(--text);
-    background:#15151d;
-    border:1px solid var(--hairline);
-    padding:6px 12px;
-    border-radius:8px;
-    box-shadow:0 10px 24px rgba(0,0,0,.4);
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .2s ease, transform .2s ease;
-    z-index:5;
-  }
-  /* Small arrow pointing down at the logo */
-  .logo-item::before{
-    content:'';
-    position:absolute;
-    left:50%; bottom:calc(100% + 4px);
-    transform:translateX(-50%);
-    width:8px; height:8px;
-    background:#15151d;
-    border-right:1px solid var(--hairline);
-    border-bottom:1px solid var(--hairline);
-    transform:translateX(-50%) rotate(45deg);
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .2s ease;
-    z-index:5;
-  }
-  .logo-item:hover::after, .logo-item:focus-visible::after{
-    opacity:1;
-    transform:translate(-50%, 0);
-  }
-  .logo-item:hover::before, .logo-item:focus-visible::before{
-    opacity:1;
-  }
-
-  /* Featured stat / toggle: "Years of experience" is now a button that
-     reveals the Roles grid below it (see .roles-panel) — glowing ring,
-     gradient number, count-up on scroll (see script), chevron flips on open.
-     Deliberately unboxed — no border/background card, just the glowing
-     gradient number sitting directly on the page. */
-  .stat-hero{
-    position:relative;
-    display:inline-flex;
-    align-items:center;
-    gap:16px;
-    margin:0 0 44px;
-    padding:4px 0;
-    border:none;
-    background:none;
-    box-shadow:none;
-    border-radius:0;
-    cursor:pointer;
-    font:inherit;
-    text-align:left;
-    -webkit-tap-highlight-color:transparent;
-    transition:transform .3s ease, filter .3s ease;
-  }
-  .stat-hero:hover, .stat-hero:focus-visible{
-    filter:brightness(1.12);
-    outline:none;
-  }
-  .stat-hero:active{transform:scale(.98);}
-  .stat-hero b{
-    position:relative;
-    display:flex;
-    align-items:flex-start;
-    font-family:'Space Grotesk', sans-serif;
-    font-size:clamp(46px, 8vw, 68px);
-    font-weight:600;
-    line-height:1;
-    background:linear-gradient(160deg, #fff, var(--c-violet));
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    filter:drop-shadow(0 0 28px color-mix(in srgb, var(--c-violet) 55%, transparent));
-  }
-  .stat-hero-plus{ font-size:.42em; margin-top:.15em; }
-  .stat-hero-label{
-    position:relative;
-    color:var(--muted);
-    font-size:13px;
-    font-weight:500;
-    line-height:1.4;
-    letter-spacing:.01em;
-  }
-  .stat-hero-chevron{
-    position:relative;
-    width:9px; height:9px;
-    margin-left:2px;
-    border-right:1.6px solid var(--muted);
-    border-bottom:1.6px solid var(--muted);
-    transform:rotate(45deg);
-    transition:transform .4s var(--ease-lux);
-  }
-  .stat-hero[aria-expanded="true"] .stat-hero-chevron{
-    transform:rotate(225deg);
-  }
-
-  /* Roles grid: collapsed by default, unfurls when the "Years of experience"
-     button above is clicked — keeps Career compact until asked to expand. */
-  .roles-panel{
-    display:grid;
-    grid-template-rows:0fr;
-    opacity:0;
-    visibility:hidden;
-    transition:grid-template-rows .7s var(--ease-lux), opacity .5s ease, visibility 0s linear .7s;
-  }
-  .roles-panel-inner{
-    min-height:0;
-    overflow:hidden;
-  }
-  .roles-panel .skill-grid{padding-top:8px;}
-  .roles-panel.is-open{
-    grid-template-rows:1fr;
-    opacity:1;
-    visibility:visible;
-    transition-delay:0s;
-  }
-  @media (max-width:520px){
-    .stat-hero{gap:12px; margin-bottom:34px;}
-  }
-
-  /* ---------- CAREER ---------- */
-  .career-points{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px 10px;
-    margin:0 0 28px;
-    padding:0;
-    list-style:none;
-  }
-  .career-points li{
-    font-size:13px;
-    color:var(--text);
-    border:1px solid var(--hairline);
-    background:rgba(255,255,255,.03);
-    padding:7px 14px;
-    border-radius:999px;
-  }
-
-  /* what I can do — five compact cards, each with its own accent colour.
-     Only number + title + one line are visible; "See more" opens the rest.
-     Clicking the title jumps to the matching photos in Projects. */
-  .skill-grid{
-    display:grid;
-    grid-template-columns:repeat(6, 1fr);
-    gap:10px;
-    align-items:start; /* an opened card grows on its own, neighbours keep their height */
-  }
-  .skill{
-    --accent:var(--c-violet);
-    position:relative;
-    grid-column:span 3;  /* row 1: two cards */
-    display:flex;
-    flex-direction:column;
-    padding:18px 18px 16px;
-    border:1px solid var(--hairline);
-    border-radius:14px;
-    background:rgba(255,255,255,.02); /* fallback for browsers without color-mix() */
-    background:
-      radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
-      rgba(255,255,255,.02);
-    overflow:hidden;
-    transition:transform .5s var(--ease-lux), border-color .4s ease, box-shadow .5s ease;
-  }
-  .skill:hover, .skill.is-open{
-    border-color:rgba(255,255,255,.28);
-    border-color:color-mix(in srgb, var(--accent) 55%, transparent);
-    box-shadow:0 18px 50px -18px color-mix(in srgb, var(--accent) 45%, transparent);
-  }
-  .skill:nth-child(n+3){grid-column:span 2;} /* row 2: three cards (Branding, 3D & Video, And More) */
-  .skill:hover{transform:translateY(-3px);}
-  .skill-num{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-size:10.5px;
-    letter-spacing:.12em;
-    color:var(--muted);
-    margin-bottom:10px;
-  }
-  .skill-num::before{
-    content:'';
-    width:6px; height:6px;
-    border-radius:50%;
-    background:var(--accent);
-    box-shadow:0 0 10px var(--accent);
-  }
-  .skill h3{
-    font-size:16.5px;
-    font-weight:600;
-    line-height:1.2;
-    margin:0 0 4px;
-  }
-  .skill h3 a{
-    display:inline-flex;
-    align-items:center;
-    gap:10px;
-    color:inherit;
-    transition:color .3s ease;
-  }
-  .skill h3 a:hover, .skill h3 a:focus-visible{color:var(--accent); outline:none;}
-  .skill-arrow{
-    width:13px; height:13px;
-    flex-shrink:0;
-    color:var(--accent);
-    opacity:.55;
-    transition:transform .5s var(--ease-lux), opacity .3s ease;
-  }
-  .skill h3 a:hover .skill-arrow,
-  .skill h3 a:focus-visible .skill-arrow{
-    transform:translateY(4px);
-    opacity:1;
-  }
-  .skill .skill-tagline{
-    font-family:'Space Grotesk', sans-serif;
-    font-size:12.5px;
-    line-height:1.4;
-    color:var(--accent);
-    margin:0;
-  }
-  .skill .more-inner p{
-    font-size:12.5px;
-    line-height:1.6;
-    color:var(--muted);
-    margin:12px 0 10px;
-  }
-  .skill-tags{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    margin:0;
-    padding:0;
-    list-style:none;
-  }
-  .skill-tags li{
-    font-size:10.5px;
-    color:var(--text);
-    padding:4px 9px;
-    border-radius:999px;
-    border:1px solid var(--hairline);
-    background:rgba(255,255,255,.03);
-  }
-
-  /* 5th card "And More": same size as its neighbours, its pill leads to ALL projects */
-  .skill-cta{
-    display:inline-flex;
-    align-items:center;
-    align-self:flex-start;
-    gap:7px;
-    margin-top:12px;
-    padding:6px 13px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.18);
-    background:rgba(255,255,255,.04);
-    color:var(--text);
-    font-size:11px;
-    font-weight:500;
-    transition:background .35s ease, color .35s ease, border-color .35s ease;
-  }
-  .skill-cta svg{
-    width:10px; height:10px;
-    transition:transform .5s var(--ease-lux);
-  }
-  .skill-cta:hover, .skill-cta:focus-visible{
-    background:#fff;
-    border-color:#fff;
-    color:#0a0a0d;
-    outline:none;
-  }
-  .skill-cta:hover svg, .skill-cta:focus-visible svg{transform:translateY(3px);}
-
-  /* shared "See more" pattern (cards + timeline) */
-  .more{
-    display:grid;
-    grid-template-rows:0fr;
-    opacity:0;
-    visibility:hidden;
-    transition:grid-template-rows .7s var(--ease-lux), opacity .5s ease, visibility 0s linear .7s;
-  }
-  .more-inner{
-    min-height:0;
-    overflow:hidden;
-    filter:blur(8px);
-    transition:filter .6s ease;
-  }
-  .is-open > .more,
-  .is-open .tl-body > .more{
-    grid-template-rows:1fr;
-    opacity:1;
-    visibility:visible;
-    transition-delay:0s;
-  }
-  .is-open > .more .more-inner,
-  .is-open .tl-body > .more .more-inner{filter:none;}
-
-  .more-toggle{
-    display:inline-flex;
-    align-items:center;
-    align-self:flex-start;
-    gap:7px;
-    margin-top:12px;
-    padding:6px 13px;
-    border-radius:999px;
-    border:1px solid var(--hairline);
-    background:transparent;
-    color:var(--muted);
-    font-family:inherit;
-    font-size:11px;
-    cursor:pointer;
-    transition:background .3s ease, border-color .3s ease, color .3s ease;
-  }
-  .more-toggle:hover, .more-toggle:focus-visible{
-    background:rgba(255,255,255,.06);
-    border-color:rgba(255,255,255,.25);
-    color:var(--text);
-    outline:none;
-  }
-  .more-toggle .pm{position:relative; width:10px; height:10px; flex-shrink:0;}
-  .more-toggle .pm::before,
-  .more-toggle .pm::after{
-    content:'';
-    position:absolute;
-    left:0; right:0; top:50%;
-    height:1.5px; margin-top:-.75px;
-    border-radius:2px;
-    background:currentColor;
-    transition:transform .5s var(--ease-lux);
-  }
-  .more-toggle .pm::after{transform:rotate(90deg);}
-  .is-open .more-toggle .pm::after{transform:rotate(0deg);} /* + becomes − */
-
-  /* experience — hairline timeline */
-  .career-sub{margin:72px 0 16px;}
-  .career-sub.first{margin-top:0;}
-  .career-sub .logos-label{
-    display:block;
-    font-size:12px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    color:var(--muted);
-  }
-  .timeline{border-bottom:1px solid var(--hairline);}
-  .tl-item{
-    display:grid;
-    grid-template-columns:190px 1fr;
-    gap:32px;
-    padding:30px 0;
-    border-top:1px solid var(--hairline);
-  }
-  .tl-date{
-    font-size:13px;
-    letter-spacing:.04em;
-    color:var(--muted);
-    padding-top:5px;
-    font-variant-numeric:tabular-nums;
-  }
-  .tl-date.now::before{
-    content:'';
-    display:inline-block;
-    width:7px; height:7px;
-    margin-right:9px;
-    border-radius:50%;
-    background:var(--c-mint);
-    box-shadow:0 0 10px var(--c-mint);
-  }
-  .tl-body h3{
-    font-size:21px;
-    font-weight:600;
-    margin:0 0 4px;
-  }
-  .tl-body h3 span{
-    font-family:'Inter', sans-serif;
-    font-size:15px;
-    font-weight:400;
-    color:var(--muted);
-  }
-  .tl-body p{
-    font-size:15px;
-    line-height:1.75;
-    color:var(--muted);
-    margin:8px 0 0;
-    max-width:64ch;
-  }
-  .tl-body .more-toggle{margin-top:14px;}
-  .tl-body ul{
-    list-style:none;
-    margin:14px 0 0;
-    padding:0;
-    display:grid;
-    gap:8px;
-  }
-  .tl-body li{
-    position:relative;
-    padding-left:24px;
-    font-size:15px;
-    line-height:1.6;
-    color:var(--text);
-  }
-  .tl-body li::before{
-    content:'';
-    position:absolute;
-    left:0; top:.72em;
-    width:12px; height:1px;
-    background:linear-gradient(90deg, var(--c-violet), var(--c-cyan));
-  }
-
-  /* scroll reveal (fade + blur + rise) — the same "developing" feel as the project photos.
-     Only active when JS runs and the visitor hasn't asked for reduced motion. */
-  .rv-on .rv{
-    opacity:0;
-    filter:blur(10px);
-    transform:translateY(24px);
-    transition:
-      opacity .9s cubic-bezier(.33,0,.2,1) var(--d, 0ms),
-      filter 1.1s cubic-bezier(.22,.75,.3,1) var(--d, 0ms),
-      transform 1.3s var(--ease-lux) var(--d, 0ms);
-  }
-  .rv-on .rv.in{
-    opacity:1;
-    filter:none;
-    transform:none;
-  }
-
-  /* ---------- PROJECTS ---------- */
-  .project-filters{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-bottom:32px;
-    /* on narrow screens the row scrolls sideways instead of wrapping
-       into a tall stack, so it stays out of the way of the grid */
-    overflow-x:auto;
-    -ms-overflow-style:none;
-    scrollbar-width:none;
-    padding-bottom:2px;
-  }
-  .project-filters::-webkit-scrollbar{display:none;}
-  .filter-btn{
-    flex-shrink:0;
-    display:inline-flex;
-    align-items:center;
-    background:transparent;
-    border:1px solid var(--hairline);
-    color:var(--muted);
-    font-size:13px;
-    font-family:inherit;
-    white-space:nowrap;
-    padding:9px 20px;
-    border-radius:999px;
-    cursor:pointer;
-    transition:background .45s var(--ease-lux), border-color .45s var(--ease-lux), color .45s var(--ease-lux);
-  }
-  .filter-btn:hover, .filter-btn:focus-visible{
-    border-color:rgba(255,255,255,0.25);
-    color:var(--text);
-  }
-  .filter-btn.active{
-    background:#fff;
-    border-color:#fff;
-    color:#0a0a0d;
-    font-weight:600;
-  }
-  .project-grid{
-    display:grid;
-    grid-template-columns:repeat(8, 1fr);
-    gap:10px;
-    align-content:start; /* keeps rows square while the height is being animated */
-    /* height is animated from JS when the number of rows changes between categories */
-    transition:height .85s var(--ease-lux);
-  }
-  .project-grid.is-resizing{overflow:hidden;}
-  .project-grid.is-switching{pointer-events:none;}
-  .project-card{
-    position:relative;
-    display:block;
-    border-radius:12px;
-    overflow:hidden;
-    aspect-ratio:1/1;
-    background:#15151d center/cover no-repeat;
-    cursor:pointer;
-  }
-  .project-card .tag{
-    position:absolute;
-    left:8px; bottom:8px;
-    font-size:10px;
-    background:rgba(7,7,11,.7);
-    backdrop-filter:blur(6px);
-    padding:4px 9px;
-    border-radius:999px;
-    border:1px solid var(--hairline);
-    white-space:nowrap;
-  }
-  .project-card::before{
-    content:'';
-    position:absolute; inset:0;
-    background:linear-gradient(180deg, transparent 50%, rgba(0,0,0,.55));
-    opacity:0;
-    transition:opacity .3s ease;
-    z-index:1;
-  }
-  .project-card:hover::before{opacity:1;}
-  .project-card img{
-    width:100%; height:100%; object-fit:cover;
-    transition:transform .5s ease, filter .6s ease, opacity .6s ease;
-  }
-  .project-card:hover img{transform:scale(1.08);}
-
-  /* "Show more" — the last tile, blurred with a "•••" icon; click to reveal more photos */
-  .project-card.more-tile img{
-    filter:blur(9px) brightness(.55);
-    transform:scale(1.15);
-  }
-  .project-card.more-tile:hover img{
-    filter:blur(9px) brightness(.65);
-    transform:scale(1.22);
-  }
-  .project-card.more-tile .more-icon{
-    position:absolute; inset:0;
-    z-index:2;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    color:var(--text);
-    background:rgba(0,0,0,0.15);
-  }
-  .more-icon .dots{
-    font-size:22px;
-    font-weight:700;
-    letter-spacing:3px;
-    line-height:1;
-  }
-  .more-icon .more-count{
-    font-size:11px;
-    color:var(--muted);
-  }
-
-  /* "Show less" — a compact button BELOW the grid, doesn't take up a tile slot */
-  .project-grid-actions{
-    display:flex;
-    justify-content:center;
-    margin-top:24px;
-  }
-  .collapse-btn{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    background:transparent;
-    border:1px solid var(--hairline);
-    color:var(--muted);
-    font-size:13px;
-    font-family:inherit;
-    padding:9px 20px;
-    border-radius:999px;
-    cursor:pointer;
-    transition:background .25s ease, border-color .25s ease, color .25s ease;
-  }
-  .collapse-btn:hover,
-  .collapse-btn:focus-visible{
-    background:rgba(255,255,255,0.06);
-    border-color:rgba(255,255,255,0.25);
-    color:var(--text);
-  }
-  .collapse-btn .chevron{
-    font-size:13px;
-    line-height:1;
-    transform:scaleY(0.8);
-  }
-
-  /* ---------- PROJECT REVEAL ANIMATION ----------
-     Switching a category tab: the current photos dissolve out (blur + fade),
-     then the new set "develops" one by one in a soft diagonal wave.
-     Every photo fades, un-blurs and drifts up on its OWN easing curve, while
-     the image inside slowly settles from a slight zoom — that layering is what
-     gives it the slow, expensive feel. Per-photo delays are set from JS.
-     The same reveal is reused when "show more" is clicked. */
-  .project-card.is-pending{opacity:0;} /* waiting for its turn in the wave (still keeps its grid slot) */
-
-  .project-card.is-in{
-    animation:
-      pcFade .95s cubic-bezier(.33,0,.2,1),
-      pcBlur 1.3s cubic-bezier(.22,.75,.3,1),
-      pcRise 1.5s var(--ease-lux);
-  }
-  .project-card.is-in img{
-    animation:pcSettle 1.9s var(--ease-lux);
-  }
-  @keyframes pcFade  { from{opacity:0;} }
-  @keyframes pcBlur  { from{filter:blur(22px) saturate(.7);} }
-  @keyframes pcRise  { from{transform:translateY(28px) scale(.94);} }
-  @keyframes pcSettle{ from{transform:scale(1.22);} }
-
-  /* Leaving: quick, slightly staggered blur-out (delay comes from --out) */
-  .project-card.is-leaving{
-    animation:pcLeave .42s cubic-bezier(.5,0,.75,0) forwards;
-    animation-delay:var(--out, 0ms);
-  }
-  @keyframes pcLeave{
-    to{opacity:0; filter:blur(14px); transform:translateY(-10px) scale(.96);}
-  }
-
-  /* shown when a category has no photos yet */
-  .project-empty{
-    grid-column:1 / -1;
-    padding:56px 20px;
-    text-align:center;
-    font-size:14px;
-    color:var(--muted);
-    border:1px dashed var(--hairline);
-    border-radius:14px;
-    animation:
-      pcFade .9s cubic-bezier(.33,0,.2,1),
-      pcBlur 1.2s cubic-bezier(.22,.75,.3,1),
-      pcRise 1.3s var(--ease-lux);
-  }
-
-  /* ---------- CONTACT ---------- */
-  .contact-wrap{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-    gap:40px;
-    flex-wrap:wrap;
-  }
-  .contact-wrap h2{
-    font-size:clamp(30px,6vw,64px);
-    font-weight:600;
-    margin:0;
-    max-width:640px;
-    line-height:1.1;
-  }
-  .contact-links{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-  }
-  .contact-links a{
-    font-size:15px;
-    color:var(--muted);
-    transition:color .2s ease;
-  }
-  .contact-links a:hover{color:var(--text);}
-
-  footer{
-    text-align:center;
-    padding:40px 20px 50px;
-    color:var(--muted);
-    font-size:13px;
-    border-top:1px solid var(--hairline);
-  }
-
-  @media (max-width: 1100px){
-    .project-grid{grid-template-columns:repeat(6, 1fr);}
-  }
-
-  @media (max-width: 760px){
-    .about-grid{grid-template-columns:1fr; gap:36px;}
-    .portrait{max-width:300px;}
-    .project-grid{grid-template-columns:repeat(4, 1fr); gap:8px;}
-    header{padding:20px 5vw;}
-    nav{gap:20px;}
-    section{padding:72px 6vw;}
-    .section-head{margin-bottom:36px;}
-    .hero{padding:120px 16px 70px;}
-    .orbit-card{width:clamp(48px, 11vw, 88px);}
-  }
-  /* ---------- LIGHTBOX ---------- */
-  .lightbox{
-    position:fixed;
-    inset:0;
+    top:0;
+    left:0;
+    right:0;
     z-index:100;
     display:flex;
-    align-items:center;
     justify-content:center;
-    padding:40px;
-    background:rgba(4,4,7,0.92);
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .3s ease;
-  }
-  .lightbox.active{
-    opacity:1;
-    pointer-events:auto;
-  }
-  .lightbox img{
-    max-width:min(90vw, 900px);
-    max-height:85vh;
-    width:auto; height:auto;
-    border-radius:16px;
-    box-shadow:0 40px 100px rgba(0,0,0,.6);
-    transform:scale(.94);
-    transition:transform .3s ease;
-  }
-  .lightbox.active img{ transform:scale(1); }
-  .lightbox-close{
-    position:absolute;
-    top:26px; right:28px;
-    width:44px; height:44px;
-    border-radius:50%;
-    border:1px solid var(--hairline);
-    background:rgba(255,255,255,0.06);
-    color:var(--text);
-    font-size:18px;
-    cursor:pointer;
-    transition:background .2s ease, transform .2s ease;
-  }
-  .lightbox-close:hover{
-    background:rgba(255,255,255,0.14);
-    transform:scale(1.06);
+    gap:clamp(18px,4vw,48px);
+    padding:26px 16px;
+    font-family:var(--serif-sc);
+    font-size:12.5px;
+    letter-spacing:.12em;
+    color:var(--cream-100);
+    transition:background .4s ease, color .4s ease, padding .3s ease;
   }
 
-  /* ---------- CONTACT MODAL (glass / blur card) ----------
-     Opens centered on screen when any "Contact" link is clicked. */
-  .contact-overlay{
-    position:fixed;
-    inset:0;
-    z-index:200;
+  .nav.solid{
+    background:rgba(34,54,44,.72);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    padding:16px 16px;
+    box-shadow:0 1px 0 rgba(215,183,129,.22);
+  }
+
+  .nav a{
+    text-decoration:none;
+    opacity:.82;
+    transition:opacity .2s;
+  }
+
+  .nav a:hover,
+  .nav a:focus-visible{ opacity:1; }
+
+  .nav a:focus-visible{
+    outline:1px solid var(--gold-300);
+    outline-offset:4px;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100svh;
+    background:
+      radial-gradient(90% 60% at 50% 0%, rgba(215,183,129,.12), transparent 62%),
+      radial-gradient(70% 50% at 50% 100%, rgba(0,0,0,.18), transparent 60%),
+      linear-gradient(190deg, var(--pine-700) 0%, var(--pine-900) 78%);
+    color:var(--cream-100);
     display:flex;
+    flex-direction:column;
     align-items:center;
     justify-content:center;
-    padding:24px;
-    background:rgba(4,4,8,.6);
-    backdrop-filter:blur(14px) saturate(140%);
-    -webkit-backdrop-filter:blur(14px) saturate(140%);
-    opacity:0;
-    visibility:hidden;
-    pointer-events:none;
-    transition:opacity .4s ease, visibility 0s linear .4s;
-  }
-  .contact-overlay.is-open{
-    opacity:1;
-    visibility:visible;
-    pointer-events:auto;
-    transition:opacity .4s ease, visibility 0s linear 0s;
-  }
-  .contact-card{
+    text-align:center;
+    padding:120px 24px 80px;
     position:relative;
-    width:min(400px, 100%);
-    padding:34px 30px 30px;
-    border-radius:28px;
     overflow:hidden;
-    border:1px solid rgba(255,255,255,.14);
-    background:linear-gradient(165deg, rgba(255,255,255,.10), rgba(255,255,255,.015));
-    backdrop-filter:blur(30px) saturate(160%);
-    -webkit-backdrop-filter:blur(30px) saturate(160%);
-    box-shadow:0 40px 100px -24px rgba(0,0,0,.65);
-    transform:translateY(22px) scale(.96);
+  }
+
+  .hero::before{
+    content:"";
+    position:absolute;
+    width:1px;
+    height:60px;
+    background:linear-gradient(var(--gold-300), transparent);
+    left:50%;
+    top:30px;
+  }
+
+  .hero-eyebrow{
+    font-family:var(--script);
+    font-size:clamp(22px,3vw,28px);
+    color:var(--gold-300);
+    margin:0 0 20px;
     opacity:0;
-    transition:transform .55s var(--ease-lux), opacity .45s ease;
+    animation:riseIn .9s ease forwards .15s;
   }
-  .contact-overlay.is-open .contact-card{
-    transform:translateY(0) scale(1);
-    opacity:1;
+
+  .hero-logo{
+    width:min(62vw, 480px);
+    margin:0 auto;
+    opacity:0;
+    animation:riseIn 1.1s ease forwards .35s;
   }
-  .contact-card-glow{
+
+  .hero-logo img{
+    display:block;
+    width:100%;
+    height:auto;
+    margin:0 auto;
+  }
+
+  .hero-date{
+    margin:32px 0 6px;
+    font-family:var(--serif-sc);
+    font-size:clamp(15px,2.2vw,18px);
+    letter-spacing:.2em;
+    color:var(--cream-200);
+    opacity:0;
+    animation:riseIn 1s ease forwards .6s;
+  }
+
+  .hero-place{
+    margin:0 0 44px;
+    font-style:normal;
+    font-size:16.5px;
+    color:var(--cream-200);
+    opacity:.85;
+    animation:riseIn 1s ease forwards .75s;
+  }
+
+  .countdown{
+    display:flex;
+    gap:clamp(16px,4vw,36px);
+    opacity:0;
+    animation:riseIn 1s ease forwards .95s;
+  }
+
+  .countdown div{ text-align:center; }
+
+  .countdown .num{
+    display:block;
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:clamp(24px,4.6vw,34px);
+    color:var(--cream-100);
+    font-variant-numeric:tabular-nums;
+  }
+
+  .countdown .label{
+    display:block;
+    margin-top:6px;
+    font-family:var(--serif-sc);
+    font-size:10px;
+    letter-spacing:.18em;
+    color:var(--gold-300);
+  }
+
+  @keyframes riseIn{
+    from{ opacity:0; transform:translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .scroll-cue{
     position:absolute;
-    top:-30%; left:-20%;
-    width:75%; height:65%;
-    background:radial-gradient(circle, color-mix(in srgb, var(--c-violet) 55%, transparent), transparent 70%);
-    filter:blur(30px);
-    pointer-events:none;
-    z-index:0;
+    bottom:22px;
+    left:50%;
+    transform:translateX(-50%);
+    width:1px;
+    height:32px;
+    background:linear-gradient(to top, var(--gold-300), transparent);
   }
-  .contact-card-glow.two{
-    top:auto; left:auto; bottom:-25%; right:-20%;
-    background:radial-gradient(circle, color-mix(in srgb, var(--c-cyan) 45%, transparent), transparent 70%);
+
+  /* ---------- SECTION SHELL ---------- */
+  section{ padding:104px 24px; }
+
+  .section-inner{ max-width:600px; margin:0 auto; }
+  .section-inner.wide{ max-width:900px; }
+
+  .kicker{
+    font-family:var(--script);
+    font-weight:normal;
+    font-size:clamp(30px,5vw,42px);
+    text-align:center;
+    color:var(--clay-600);
+    margin:0 0 6px;
   }
-  .contact-card-close{
-    position:absolute;
-    top:16px; right:16px;
-    z-index:2;
-    width:26px; height:26px;
-    border-radius:50%;
-    border:1px solid rgba(255,255,255,.16);
-    background:rgba(255,255,255,.06);
-    color:var(--text);
-    font-size:11px;
-    line-height:1;
+
+  .kicker.on-dark{ color:var(--gold-300); }
+
+  .heading{
+    font-family:var(--serif-sc);
+    text-align:center;
+    font-weight:500;
+    font-size:clamp(24px,4vw,32px);
+    letter-spacing:.03em;
+    margin:0 0 40px;
+    color:var(--ink-900);
+  }
+
+  .heading.on-dark{ color:var(--cream-100); }
+
+  .divider{
+    width:56px;
+    height:1px;
+    background:var(--gold-500);
+    margin:26px auto;
+    border:0;
+  }
+
+  /* ---------- INVITE ---------- */
+  .invite{ background:var(--cream-100); text-align:center; }
+
+  .invite p{
+    font-size:18.5px;
+    line-height:1.8;
+    color:var(--ink-700);
+    margin:0 auto;
+    max-width:50ch;
+  }
+
+  .placeholder-photo{
+    aspect-ratio:4/5;
+    max-width:280px;
+    margin:0 auto 40px;
+    background:
+      repeating-linear-gradient(
+        135deg,
+        rgba(178,138,82,.14) 0 2px,
+        transparent 2px 14px
+      ),
+      var(--cream-200);
+    border:1px solid rgba(178,138,82,.4);
     display:flex;
     align-items:center;
     justify-content:center;
-    cursor:pointer;
-    transition:background .2s ease, transform .2s ease;
+    font-family:var(--serif-sc);
+    font-size:11px;
+    letter-spacing:.12em;
+    color:var(--gold-500);
+    text-align:center;
+    padding:16px;
+    overflow:hidden;
   }
-  .contact-card-close:hover{
-    background:rgba(255,255,255,.16);
-    transform:scale(1.06);
+
+  .placeholder-photo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
   }
-  .contact-card-top{
-    position:relative;
-    z-index:1;
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:16px;
-    padding-right:34px;
-    margin-bottom:34px;
+
+  /* ---------- LOVE STORY ---------- */
+  .story{ background:var(--pine-900); color:var(--cream-100); }
+
+  .story-row{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:26px;
+    margin-bottom:0;
   }
-  .contact-card-eyebrow b{
-    display:block;
-    font-family:'Space Grotesk', sans-serif;
-    font-size:13px;
-    font-weight:700;
-    letter-spacing:.03em;
+
+  @media(min-width:720px){
+    .story-row{
+      grid-template-columns:260px 1fr;
+      align-items:center;
+      gap:48px;
+    }
   }
-  .contact-card-eyebrow span{
-    display:block;
-    font-size:12px;
-    color:var(--muted);
-    margin-top:2px;
-  }
-  .contact-card-name{
-    position:relative;
-    z-index:1;
-    font-size:clamp(28px, 7vw, 34px);
-    font-weight:700;
-    line-height:1.15;
-    letter-spacing:-0.01em;
-    margin:0 0 26px;
-  }
-  .contact-card-info{
-    position:relative;
-    z-index:1;
-    list-style:none;
+
+  .story-row .placeholder-photo{
     margin:0;
-    padding:0;
+    max-width:none;
+    aspect-ratio:4/5;
   }
-  .contact-card-info li{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:14px;
-    padding:12px 0;
-    border-top:1px solid rgba(255,255,255,.10);
+
+  .story-row p{
+    font-size:17px;
+    line-height:1.85;
+    color:var(--cream-200);
+    margin:0;
   }
-  .contact-card-info li:first-child{border-top:none;}
-  .ci-label{
-    font-size:11.5px;
-    letter-spacing:.06em;
-    text-transform:uppercase;
-    color:var(--muted);
+
+  .story-row .tag{
+    display:block;
+    font-family:var(--script);
+    font-size:24px;
+    color:var(--gold-300);
+    margin-bottom:8px;
   }
-  .ci-value{
-    font-family:'Space Grotesk', sans-serif;
-    font-size:14.5px;
+
+  /* ---------- DETAILS ---------- */
+  .details{ background:var(--cream-200); }
+
+  .cards{
+    display:grid;
+    gap:22px;
+    grid-template-columns:1fr;
+    margin-bottom:60px;
+  }
+
+  @media(min-width:640px){
+    .cards{ grid-template-columns:1fr 1fr; }
+  }
+
+  .card{
+    background:var(--cream-100);
+    border:1px solid rgba(178,138,82,.32);
+    padding:34px 28px;
+    text-align:center;
+  }
+
+  .card .tag{
+    display:block;
+    font-family:var(--script);
+    font-size:26px;
+    color:var(--clay-600);
+    margin-bottom:8px;
+  }
+
+  .card h3{
+    font-family:var(--serif-sc);
     font-weight:500;
-    text-align:right;
-  }
-  .ci-value a{transition:color .25s ease;}
-  .ci-value a:hover, .ci-value a:focus-visible{color:var(--c-cyan);}
-
-  @media (max-width: 480px){
-    .contact-card{padding:28px 22px 24px; border-radius:22px;}
-    .contact-card-name{margin-bottom:20px;}
+    font-size:15px;
+    letter-spacing:.1em;
+    margin:0 0 14px;
+    color:var(--ink-900);
   }
 
-
-  @media (max-width: 480px){
-    .project-grid{grid-template-columns:repeat(3, 1fr); gap:6px;}
-    header{padding:18px 4vw;}
-    nav{gap:14px;}
-    nav a{font-size:12.5px;}
-    .brand-mark{font-size:11px;}
-    .hero{padding:110px 14px 60px;}
-    .hero-content h1{margin-bottom:12px;}
-    .hero-content p{margin-bottom:22px;}
-    section{padding:56px 5vw;}
-    .about-logos{margin-top:28px;}
-    .logos-row{gap:24px;}
-    .logo-item img{height:22px;}
-    .contact-wrap{gap:26px;}
-    .lightbox{padding:16px;}
-    .lightbox-close{top:14px; right:14px; width:38px; height:38px; font-size:16px;}
+  .card p{
+    margin:0 0 22px;
+    color:var(--ink-700);
+    line-height:1.65;
+    font-size:16px;
   }
 
-  @media (max-width: 360px){
-    nav{gap:10px;}
-    nav a{font-size:11.5px;}
-    .brand-mark{display:none;} /* keeps the 3 nav links from wrapping/overlapping on very small phones */
-    .project-grid{grid-template-columns:repeat(2, 1fr);}
+  .btn-outline{
+    display:inline-block;
+    padding:11px 26px;
+    border:1px solid var(--gold-500);
+    font-family:var(--serif-sc);
+    font-size:12px;
+    letter-spacing:.12em;
+    text-decoration:none;
+    color:var(--ink-900);
+    transition:background .25s ease, color .25s ease, border-color .25s ease;
   }
 
-  @media (max-width: 900px){
-    .skill-grid{grid-template-columns:1fr 1fr;}
-    .skill, .skill:nth-child(n+3){grid-column:auto;}
-    .skill:last-child{grid-column:1 / -1;} /* odd card out gets the full row */
+  .btn-outline:hover,
+  .btn-outline:focus-visible{
+    background:var(--ink-900);
+    border-color:var(--ink-900);
+    color:var(--cream-100);
   }
-  @media (max-width: 600px){
-    .skill-grid{grid-template-columns:1fr;}
-    .skill:last-child{grid-column:auto;}
-    .career-sub{margin-top:56px;}
-    .tl-item{grid-template-columns:1fr; gap:10px; padding:24px 0;}
-    .tl-date{padding-top:0;}
+
+  .itinerary{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:32px 20px;
+    max-width:520px;
+    margin:0 auto;
+  }
+
+  @media(min-width:640px){
+    .itinerary{ grid-template-columns:repeat(4,1fr); }
+  }
+
+  .itin-item{ text-align:center; }
+
+  .itin-item .time{
+    display:block;
+    font-family:var(--serif-sc);
+    font-size:13px;
+    letter-spacing:.06em;
+    color:var(--gold-500);
+    margin-bottom:6px;
+  }
+
+  .itin-item .what{
+    font-family:var(--script);
+    font-size:21px;
+    color:var(--ink-900);
+  }
+
+  /* ---------- DRESSCODE / NOTES ---------- */
+  .notes{ background:var(--cream-100); }
+
+  .note-block{ text-align:center; margin-bottom:46px; }
+  .note-block:last-child{ margin-bottom:0; }
+
+  .note-block h3{
+    font-family:var(--serif-sc);
+    font-weight:500;
+    font-size:14.5px;
+    letter-spacing:.14em;
+    margin:0 0 14px;
+    color:var(--ink-900);
+  }
+
+  .note-block p{
+    max-width:48ch;
+    margin:0 auto;
+    color:var(--ink-700);
+    line-height:1.75;
+    font-size:16px;
+    font-style:italic;
+  }
+
+  .palette{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:20px;
+  }
+
+  .palette span{
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    border:1px solid rgba(0,0,0,.08);
+  }
+
+  /* ---------- RSVP ---------- */
+  .rsvp{ background:var(--pine-900); color:var(--cream-100); padding-bottom:70px; }
+
+  .rsvp .deadline{
+    text-align:center;
+    font-style:italic;
+    color:var(--cream-200);
+    margin:-16px 0 40px;
+    font-size:15px;
+  }
+
+  form.rsvp-form{ display:grid; gap:20px; }
+
+  .field{ display:grid; gap:8px; }
+
+  .field label{
+    font-family:var(--serif-sc);
+    font-size:11px;
+    letter-spacing:.12em;
+    color:var(--gold-300);
+  }
+
+  .field input,
+  .field select,
+  .field textarea{
+    background:transparent;
+    border:none;
+    border-bottom:1px solid rgba(248,242,230,.32);
+    padding:10px 2px;
+    font-family:var(--serif);
+    font-size:16px;
+    color:var(--cream-100);
+  }
+
+  .field select option{ color:var(--ink-900); }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus{
+    outline:none;
+    border-bottom-color:var(--gold-300);
+  }
+
+  .field-row{ display:grid; gap:20px; }
+
+  @media(min-width:560px){
+    .field-row{ grid-template-columns:1fr 1fr; }
+  }
+
+  .rsvp-submit{
+    margin-top:10px;
+    justify-self:center;
+    background:var(--gold-500);
+    color:var(--pine-900);
+    border:1px solid var(--gold-500);
+    padding:13px 40px;
+    font-family:var(--serif-sc);
+    font-size:13px;
+    letter-spacing:.14em;
+    cursor:pointer;
+    transition:background .25s ease, color .25s ease;
+  }
+
+  .rsvp-submit:hover,
+  .rsvp-submit:focus-visible{
+    background:transparent;
+    color:var(--gold-300);
+  }
+
+  .form-note{
+    text-align:center;
+    font-size:13px;
+    color:rgba(248,242,230,.55);
+    margin-top:18px;
+  }
+
+  .form-status{
+    text-align:center;
+    font-size:15px;
+    margin-top:16px;
+    min-height:1.2em;
+  }
+
+  /* ---------- WISHES WALL / TEM ---------- */
+  .wishes-wall{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:14px;
+    margin-top:48px;
+    max-width:960px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+  .wishes-empty{
+    text-align:center;
+    font-size:14px;
+    font-style:italic;
+    color:rgba(248,242,230,.55);
+    margin-top:40px;
+  }
+
+  .stamp{
+    --rot:0deg;
+    --delay:0s;
+    position:relative;
+    width:150px;
+    padding:18px 14px 14px;
+    background:var(--cream-100);
+    color:var(--ink-900);
+    border:1px solid rgba(178,138,82,.4);
+    border-radius:14px;
+    box-shadow:0 6px 16px rgba(0,0,0,.22);
+    text-align:center;
+    transform:rotate(var(--rot));
+    animation:stampDrop .7s cubic-bezier(.28,1.55,.5,1) var(--delay) both;
+    transition:transform .3s ease, box-shadow .3s ease;
+  }
+
+  .stamp:hover,
+  .stamp:focus-within{
+    transform:rotate(0deg) translateY(-6px) scale(1.04);
+    box-shadow:0 14px 26px rgba(0,0,0,.28);
+    z-index:2;
+  }
+
+  .stamp .stamp-name{
+    display:block;
+    font-family:var(--serif-sc);
+    font-weight:500;
+    font-size:12.5px;
+    letter-spacing:.04em;
+    margin-bottom:6px;
+    color:var(--clay-600);
+  }
+
+  .stamp .stamp-msg{
+    display:block;
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--ink-700);
+    word-break:break-word;
+  }
+
+  .stamp .stamp-date{
+    display:block;
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px dashed rgba(178,138,82,.45);
+    font-family:var(--serif-sc);
+    font-size:9.5px;
+    letter-spacing:.08em;
+    color:var(--gold-500);
+  }
+
+  @keyframes stampDrop{
+    0%{
+      opacity:0;
+      transform:translateY(-46px) scale(.4) rotate(calc(var(--rot) - 14deg));
+    }
+    55%{
+      opacity:1;
+      transform:translateY(4px) scale(1.08) rotate(calc(var(--rot) + 4deg));
+    }
+    75%{
+      transform:translateY(-2px) scale(.98) rotate(calc(var(--rot) - 2deg));
+    }
+    100%{
+      opacity:1;
+      transform:translateY(0) scale(1) rotate(var(--rot));
+    }
   }
 
   @media (prefers-reduced-motion: reduce){
-    .orbit-card{animation:none; transition:none;}
-    .project-card, .project-card img, .project-empty{animation:none !important;}
-    .more, .more-inner, .skill-arrow, .skill-cta svg{transition:none;}
-    .portrait-blur{animation:none; display:none;}
-    .project-grid{transition:none;}
-    html{scroll-behavior:auto;}
+    .stamp{ animation:none !important; }
   }
 
-  /* ---------- BACKGROUND MUSIC BUTTON ---------- */
-  .music-btn{
-    position:fixed;
-    right:max(18px, env(safe-area-inset-right));
-    bottom:max(18px, env(safe-area-inset-bottom));
-    z-index:60;
-    width:46px; height:46px;
-    border-radius:50%;
-    border:1px solid var(--hairline);
-    background:rgba(13,13,19,.72);
-    -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
-    color:var(--text);
-    display:grid; place-items:center;
-    cursor:pointer;
-    transition:transform .25s ease, border-color .25s ease;
+  /* ---------- FOOTER ---------- */
+  footer{
+    background:var(--cream-100);
+    text-align:center;
+    padding:70px 24px 46px;
   }
-  .music-btn:hover{ transform:scale(1.08); border-color:rgba(255,255,255,.25); }
-  .music-btn svg{ width:20px; height:20px; }
+
+  .monogram{
+    width:min(15vw, 53px);
+    margin:0 auto 10px;
+  }
+
+  @media(max-width:600px){
+    .monogram{ width:36px; }
+  }
+
+  .monogram img{
+    display:block;
+    width:100%;
+    height:auto;
+    margin:0 auto;
+  }
+
+  footer .names{
+    font-family:var(--serif-sc);
+    letter-spacing:.12em;
+    font-size:12.5px;
+    line-height:2;
+    color:var(--ink-700);
+    margin:0 0 28px;
+  }
+
+  footer .legal{ font-size:12px; color:rgba(37,29,22,.5); }
+  footer .legal a{ text-decoration:underline; }
+
+  /* ---------- NAV: gọn lại trên màn hình nhỏ vì đã thêm mục Album ---------- */
+  @media(max-width:420px){
+    .nav{ gap:14px; font-size:11.5px; letter-spacing:.08em; }
+  }
+
+  /* ---------- ALBUM (thẻ ảnh xếp chồng, tự chạy) ---------- */
+  .album{
+    position:relative;
+    background:var(--cream-100);
+    overflow:hidden;
+    padding-bottom:40px;
+  }
+
+  /* Vầng sáng nền: mỗi ảnh một lớp, đổi màu theo tông ảnh */
+  .album-glow{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .album-glow i{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    background:radial-gradient(
+      62% 46% at 50% 50%,
+      rgba(var(--acc,178,138,82),.78) 0%,
+      rgba(var(--acc,178,138,82),.5) 22%,
+      rgba(var(--acc,178,138,82),.24) 46%,
+      rgba(var(--acc,178,138,82),.08) 68%,
+      transparent 90%
+    );
+    transition:opacity 1.3s ease;
+  }
+
+  .album-glow i.on{ opacity:1; }
+
+  .album .section-inner{ position:relative; z-index:1; }
+  .album .kicker{ margin-bottom:10px; }
+
+  .deck-wrap{
+    margin:0 -24px;          /* để thẻ ghost hai bên không bị cắt sát mép màn hình */
+    border-radius:12px;
+  }
+
+  .deck-wrap:focus-visible{
+    outline:1px solid var(--gold-500);
+    outline-offset:4px;
+  }
+
+  .deck{
+    --cw:clamp(240px,70vw,306px);
+    --ch:calc(var(--cw) * 1.4);
+    position:relative;
+    height:calc(var(--ch) * 1.4 + 30px);
+    touch-action:pan-y;              /* cuộn dọc vẫn hoạt động, vuốt ngang để đổi ảnh */
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 74%,transparent 98%);
+            mask-image:linear-gradient(to bottom,#000 0,#000 74%,transparent 98%);
+  }
+
+  /* --- thẻ ảnh --- */
+  .pcard{
+    --acc:178,138,82;
+    --acc-l:215,183,129;
+    position:absolute;
+    top:28px;
+    left:50%;
+    width:var(--cw);
+    height:var(--ch);
+    margin-left:calc(var(--cw) / -2);
+    display:flex;
+    flex-direction:column;
+    padding:12px 14px 18px;
+    border-radius:26px;
+    color:var(--cream-100);
+    background:
+      linear-gradient(168deg, rgba(var(--acc),.46) 0%, rgba(var(--acc),.1) 44%, transparent 72%),
+      linear-gradient(180deg,#1d1712,#0f0c09);
+    box-shadow:
+      0 24px 46px -14px rgba(20,14,8,.5),
+      inset 0 0 0 1px rgba(255,255,255,.07);
+    transform-origin:50% 62%;
+    will-change:transform,opacity;
+    transition:
+      transform .85s cubic-bezier(.22,1,.36,1),
+      opacity .6s ease,
+      filter .6s ease,
+      visibility 0s;
+  }
+
+  /* 5 trạng thái vị trí — JS chỉ đổi data-pos, mọi chuyển động do CSS lo */
+  .pcard[data-pos="front"]{
+    transform:translate3d(0,0,0) rotate(0deg) scale(1);
+    opacity:1;
+    filter:none;
+    z-index:30;
+    cursor:grab;
+  }
+
+  .pcard[data-pos="next"]{
+    transform:translate3d(-7.5%,-2.5%,0) rotate(-7deg) scale(.97);
+    opacity:.62;
+    filter:saturate(.7) brightness(.95);
+    z-index:20;
+  }
+
+  .pcard[data-pos="next2"]{
+    transform:translate3d(8%,3%,0) rotate(9deg) scale(.96);
+    opacity:.5;
+    filter:saturate(.7) brightness(.95);
+    z-index:10;
+  }
+
+  /* thẻ vừa lướt qua: nằm phía dưới, mờ như bóng phản chiếu */
+  .pcard[data-pos="prev"]{
+    transform:translate3d(0,116%,0) rotate(-6deg) scale(.9);
+    opacity:.5;
+    filter:blur(5px) saturate(.8);
+    z-index:5;
+    pointer-events:none;
+  }
+
+  .pcard[data-pos="hidden"]{
+    transform:translate3d(4%,2%,0) rotate(3deg) scale(.94);
+    opacity:0;
+    z-index:1;
+    pointer-events:none;
+    visibility:hidden;              /* thẻ ở xa không cần vẽ (nhẹ máy khi có nhiều ảnh) */
+    will-change:auto;
+    transition:
+      transform .85s cubic-bezier(.22,1,.36,1),
+      opacity .3s ease,
+      filter .6s ease,
+      visibility 0s linear .85s;
+  }
+
+  /* ảnh không tải được sẽ bị loại khỏi vòng lướt */
+  .pcard[data-pos="gone"]{ display:none; }
+
+  /* thẻ đang bay ra/vào luôn nằm trên cùng trong lúc chuyển */
+  .pcard.raise{ z-index:40 !important; }
+
+  .pcard.dragging{
+    transition:none !important;
+    cursor:grabbing;
+  }
+
+  .pcard-title,
+  .pcard-cap{ flex:0 0 auto; }
+
+  .pcard-title{
+    margin:14px 8px 16px;
+    text-align:center;
+    font-family:var(--serif-sc);
+    font-size:21px;
+    line-height:1.2;
+    letter-spacing:.07em;
+    color:var(--cream-100);
+    text-shadow:0 1px 14px rgba(0,0,0,.35);
+  }
+
+  .pcard-photo{
+    position:relative;
+    flex:1 1 0;              /* chiếm phần còn lại của thẻ, không phụ thuộc kích thước gốc của ảnh */
+    min-height:0;
+    margin:0;
+    border-radius:18px;
+    overflow:hidden;
+    background:rgba(255,255,255,.06);
+  }
+
+  .pcard-photo img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:var(--pos,50% 50%);
+    pointer-events:none;
+    -webkit-user-drag:none;
+  }
+
+  /* chưa có ảnh (hoặc link lỗi): hiện khung mẫu, giống các ô "Ảnh của bạn tại đây" */
+  .pcard-photo.empty{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:12px;
+    text-align:center;
+    background:
+      repeating-linear-gradient(135deg, rgba(215,183,129,.16) 0 2px, transparent 2px 14px),
+      rgba(255,255,255,.05);
+  }
+
+  .pcard-photo.empty::before{
+    content:attr(data-label);
+    font-family:var(--serif-sc);
+    font-size:11px;
+    letter-spacing:.12em;
+    color:var(--gold-300);
+  }
+
+  .pcard-pill{
+    position:absolute;
+    left:50%;
+    bottom:12px;
+    transform:translateX(-50%);
+    white-space:nowrap;
+    padding:6px 14px;
+    border-radius:999px;
+    font-family:var(--serif-sc);
+    font-size:11px;
+    letter-spacing:.1em;
+    color:var(--cream-100);
+    background:rgba(18,14,10,.58);
+    border:1px solid rgba(255,255,255,.12);
+    -webkit-backdrop-filter:blur(8px);
+    backdrop-filter:blur(8px);
+  }
+
+  .pcard-cap{
+    margin:14px 8px 0;
+    text-align:center;
+    font-size:12.5px;
+    line-height:1.55;
+    color:rgba(248,242,230,.62);
+    display:-webkit-box;
+    -webkit-line-clamp:3;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+
+  /* --- xem ảnh lớn (lightbox) --- */
+  .lb{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:rgba(17,13,10,.9);
+    -webkit-backdrop-filter:blur(10px);
+    backdrop-filter:blur(10px);
+  }
+
+  .lb.open{
+    display:flex;
+    animation:lbIn .3s ease both;
+  }
+
+  @keyframes lbIn{ from{ opacity:0; } to{ opacity:1; } }
+
+  .lb figure{
+    margin:0;
+    max-width:min(92vw,900px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+  }
+
+  .lb img{
+    max-width:100%;
+    max-height:74svh;
+    object-fit:contain;
+    border-radius:10px;
+    box-shadow:0 24px 60px rgba(0,0,0,.5);
+  }
+
+  .lb figcaption{
+    text-align:center;
+    font-size:15px;
+    line-height:1.6;
+    color:var(--cream-200);
+  }
+
+  .lb figcaption strong{
+    display:block;
+    margin-bottom:4px;
+    font-family:var(--serif-sc);
+    font-weight:500;
+    letter-spacing:.1em;
+    color:var(--gold-300);
+  }
+
+  .lb-btn{
+    position:absolute;
+    width:46px;
+    height:46px;
+    padding:0;
+    border-radius:50%;
+    border:1px solid rgba(215,183,129,.5);
+    background:rgba(255,255,255,.06);
+    color:var(--cream-100);
+    display:grid;
+    place-items:center;
+    cursor:pointer;
+    transition:background .25s ease, border-color .25s ease;
+  }
+
+  .lb-btn:hover,
+  .lb-btn:focus-visible{
+    background:rgba(215,183,129,.25);
+    border-color:var(--gold-300);
+    outline:none;
+  }
+
+  .lb-close{ top:18px; right:18px; }
+  .lb-prev{ left:14px; top:50%; margin-top:-23px; }
+  .lb-next{ right:14px; top:50%; margin-top:-23px; }
+
+  @media(max-width:600px){
+    .lb-prev,
+    .lb-next{ top:auto; bottom:22px; margin-top:0; }
+    .lb-prev{ left:calc(50% - 58px); }
+    .lb-next{ right:calc(50% - 58px); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .pcard{ transition:none !important; }
+  }
+
+
+  /* ---------- NHẠC NỀN ---------- */
+  .music-btn{
+    position:fixed; right:16px; bottom:16px; z-index:200;
+    width:46px; height:46px; border-radius:50%;
+    border:1px solid rgba(215,183,129,.7);
+    background:rgba(30,22,16,.75); color:#d7b781;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; backdrop-filter:blur(6px);
+    box-shadow:0 4px 14px rgba(0,0,0,.3);
+    padding:0; transition:transform .2s;
+  }
+  .music-btn:hover{ transform:scale(1.08); }
+  .music-btn svg{ width:20px; height:20px; fill:currentColor; }
+  .music-btn.playing{ animation:musicSpin 6s linear infinite; }
   .music-btn .ic-off{ display:none; }
-  .music-btn.is-off .ic-on{ display:none; }
-  .music-btn.is-off .ic-off{ display:block; }
+  .music-btn.muted .ic-on{ display:none; }
+  .music-btn.muted .ic-off{ display:block; }
+  .music-btn.muted{ animation:none; }
+  @keyframes musicSpin{ to{ transform:rotate(360deg); } }
 </style>
+
 </head>
+
 <body>
 
-<header>
-  <nav>
-    <a href="#about">About Me</a>
-    <a href="#projects">Projects</a>
-    <a href="#contact">Contact</a>
-  </nav>
-  <span class="brand-mark">© 2026</span>
+<nav class="nav" id="nav">
+  <a href="#home">Home</a>
+  <a href="#love-story">Love Story</a>
+  <a href="#album">Album</a>
+  <a href="#details">Details</a>
+  <a href="#rsvp">Wishes</a>
+</nav>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero" id="home">
+
+  <p class="hero-eyebrow">Chúng tôi kết hôn</p>
+
+  <div class="hero-logo">
+    <img src="./logo.png" alt="Vũ Nguyễn & Như Quỳnh">
+  </div>
+
+  <p class="hero-date">15 . 01 . 2027</p>
+
+  <p class="hero-place">Trung Hưng, Cát Tiên 3, Lâm Đồng</p>
+
+  <div class="countdown" id="countdown" aria-label="Đếm ngược đến ngày cưới">
+    <div>
+      <span class="num" id="cd-days">00</span>
+      <span class="label">Ngày</span>
+    </div>
+    <div>
+      <span class="num" id="cd-hours">00</span>
+      <span class="label">Giờ</span>
+    </div>
+    <div>
+      <span class="num" id="cd-mins">00</span>
+      <span class="label">Phút</span>
+    </div>
+    <div>
+      <span class="num" id="cd-secs">00</span>
+      <span class="label">Giây</span>
+    </div>
+  </div>
+
+  <span class="scroll-cue" aria-hidden="true"></span>
+
 </header>
 
-<!-- Background music: file audio01.mp3 must sit in the SAME folder as this index.html -->
-<audio id="bgMusic" src="audio01.mp3" loop preload="auto"></audio>
-<button class="music-btn" id="musicBtn" type="button" aria-label="Turn music off" title="Music">
-  <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
-  <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M22 9l-6 6"/><path d="M16 9l6 6"/></svg>
-</button>
+<!-- ===================== INVITE ===================== -->
+<section class="invite">
+  <div class="section-inner">
 
-<!-- ============ HERO ============ -->
-<section class="hero" style="border-top:none; padding-top:140px;">
-  <div class="orbit" id="orbit"></div>
-  <div class="hero-content">
-    <h1>Glow In The Dark</h1>
-    <p>Every photo is a story told through light. These are the moments I chose to keep.</p>
-    <a href="#contact" class="btn">Get in Touch</a>
+    <p class="kicker" style="font-size:clamp(38px,6.5vw,54px);">Thiệp mời</p>
+    <hr class="divider">
+
+    <p>
+      Chúng tôi trân trọng kính mời bạn đến chung vui trong ngày trọng đại
+      của đời mình. Sự hiện diện của bạn chính là món quà ý nghĩa nhất,
+      cùng chúng tôi lưu giữ những khoảnh khắc đáng nhớ này.
+    </p>
+
   </div>
 </section>
 
-<!-- ============ ABOUT ============ -->
-<section id="about" style="border-top:none;">
-  <div class="section-head">
-    <h2>About Me</h2>
-    <span class="idx">01 — About</span>
-  </div>
-  <div class="about-grid">
+<!-- ===================== LOVE STORY ===================== -->
+<section class="story" id="love-story">
+  <div class="section-inner wide">
 
-    <!-- Portrait (3:4). Paste your image link into PORTRAIT_SRC at the top of the script section (bottom of this file). -->
-    <figure class="portrait">
-      <span class="portrait-ph">Your photo · 3:4</span>
-      <img id="portraitImg" alt="Portrait">
-      <span class="portrait-blur" aria-hidden="true"></span>
-    </figure>
+    <p class="kicker on-dark">Chuyện tình yêu</p>
+    <hr class="divider">
 
-    <div class="about-info">
-      <!-- EDIT: short intro about yourself -->
-      <p>
-        Hi, I'm a graphic designer based in Ho Chi Minh City. I design social content,
-        logos, typography and packaging — clean structure first, then a touch of glow
-        to make it memorable.
-        <br><br>
-        I love turning simple ideas into visuals people actually remember.
-      </p>
-
-      <dl class="about-facts">
-        <!-- EDIT: your name and year of birth -->
-        <div><dt>Name</dt><dd>Your Name</dd></div>
-        <div><dt>Born</dt><dd>YYYY</dd></div>
-        <div class="wide"><dt>Based in</dt><dd>Ho Chi Minh City (TP.HCM)</dd></div>
-        <div class="wide">
-          <dt>Education</dt>
-          <dd>
-            <div class="edu-item">
-              Dong Nai College of Decorative Arts
-              <small>Graphic Design</small>
-            </div>
-            <!-- add another school:
-            <div class="edu-item">School name<small>Major</small></div> -->
-          </dd>
-        </div>
-      </dl>
-
-      <!-- Worked With: paste your partner/client logo links into the img src="" below -->
-      <div class="about-logos">
-        <span class="logos-label">Worked With</span>
-        <div class="logos-row">
-          <span class="logo-item" data-name="NAWON F&B CO., LTD." tabindex="0">
-            <img src="logo01.png" alt="NAWON F&B CO., LTD." loading="lazy">
-          </span>
-          <span class="logo-item" data-name="JB FRESH F&B CO., LTD." tabindex="0">
-            <img src="logo02.png" alt="JB FRESH F&B CO., LTD." loading="lazy">
-          </span>
-          <span class="logo-item" data-name="NICO TRADING CO., LTD." tabindex="0">
-            <img src="logo03.png" alt="NICO TRADING CO., LTD." loading="lazy">
-          </span>
-        </div>
+    <div class="story-row">
+      <div class="placeholder-photo">Ảnh của bạn<br>tại đây</div>
+      <div>
+        <span class="tag">Khởi đầu</span>
+        <p>
+          [Placeholder — hãy thay bằng câu chuyện thật của hai bạn]
+          Chúng tôi gặp nhau trong một ngày rất bình thường, nhưng không ngờ
+          đó lại là khởi đầu của một hành trình đặc biệt. Từ những cuộc trò
+          chuyện đầu tiên, chúng tôi đã tìm thấy ở nhau sự đồng điệu hiếm có.
+        </p>
       </div>
-
-      <!-- Software: black & white until hovered — then colour returns and the name shows.
-           These 4 logo files (logo-01.png ... logo-04.png) sit in the SAME folder as this
-           HTML file — same pattern as the "Worked With" logos above. -->
-      <div class="about-logos">
-        <span class="logos-label">Software</span>
-        <div class="logos-row">
-          <span class="logo-item" data-name="Adobe CC" tabindex="0">
-            <img src="logo-01.png" alt="Adobe CC" loading="lazy">
-          </span>
-          <span class="logo-item" data-name="Blender 3D" tabindex="0">
-            <img src="logo-02.png" alt="Blender 3D" loading="lazy">
-          </span>
-          <span class="logo-item" data-name="Github" tabindex="0">
-            <img src="logo-03.png" alt="Github" loading="lazy">
-          </span>
-          <span class="logo-item" data-name="Generative AI" tabindex="0">
-            <img src="logo-04.png" alt="Generative AI" loading="lazy">
-          </span>
-          <span class="logo-item" data-name="Google Workspace" tabindex="0">
-            <img src="logo-05.png" alt="Google Workspace" loading="lazy">
-          </span>
-        </div>
-        <!-- Skill tags shown under the Software logos -->
-        <ul class="career-points" style="margin-top:20px;">
-          <li>Graphic Design</li>
-          <li>Video Editor</li>
-          <li>3D Modeling</li>
-          <li>Hand-drawn</li>
-          <li>AI &amp; Generative</li>
-          <li>Project Management</li>
-          <li>Songwriting</li>
-        </ul>
-      </div>
-
     </div>
+
   </div>
 </section>
 
-<!-- ============ CAREER ============ -->
-<section id="career">
-  <div class="section-head">
-    <h2>Career</h2>
-    <span class="idx">02 — Career</span>
-  </div>
+<!-- ===================== ALBUM ===================== -->
+<section class="album" id="album">
+  <div class="album-glow" id="albumGlow" aria-hidden="true"></div>
 
-  <!-- "Years of experience" — plain, unboxed feature stat at the top of
-       Career; click it to unfurl the Roles grid below (collapsed by default). -->
-  <button type="button" class="stat-hero roles-toggle rv" data-rv data-count-to="3" aria-expanded="false" aria-controls="roles-panel">
-    <b><span class="stat-hero-num">0</span><span class="stat-hero-plus">+</span></b>
-    <span class="stat-hero-label">Years of<br>experience</span>
-    <span class="stat-hero-chevron" aria-hidden="true"></span>
+  <div class="section-inner wide">
+
+    <p class="kicker">Khoảnh khắc yêu thương</p>
+
+    <div class="deck-wrap" id="deckWrap" tabindex="0" role="region"
+         aria-roledescription="carousel"
+         aria-label="Album ảnh cưới. Dùng phím mũi tên trái hoặc phải để chuyển ảnh.">
+      <div class="deck" id="deck"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Xem ảnh lớn -->
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Xem ảnh lớn" aria-hidden="true">
+  <button class="lb-btn lb-close" id="lbClose" type="button" aria-label="Đóng">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
   </button>
-
-  <!-- Roles I've held — click a title to jump to the matching photos in Projects
-       (data-goto-cat = social | logo | typo | packaging | art); "See more" opens the details.
-       The whole Roles grid stays collapsed until "Years of experience" is clicked. -->
-  <div class="career-sub first rv" data-rv><span class="logos-label">Roles</span></div>
-  <div class="roles-panel" id="roles-panel"><div class="roles-panel-inner">
-  <div class="skill-grid">
-    <article class="skill rv" data-rv style="--accent:var(--c-violet)">
-      <span class="skill-num">01</span>
-      <h3><a href="#projects" data-goto-cat="social">Marketing Designer <svg class="skill-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h3>
-      <p class="skill-tagline">Content that gets noticed.</p>
-      <div class="more" id="more-marketing"><div class="more-inner">
-        <p>Social posts, banners and campaign visuals that keep a brand consistent and on message.</p>
-        <ul class="skill-tags"><li>Social posts</li><li>Banners</li><li>Campaign kits</li></ul>
-      </div></div>
-      <button type="button" class="more-toggle" aria-expanded="false" aria-controls="more-marketing"><span class="pm" aria-hidden="true"></span><span class="label">See more</span></button>
-    </article>
-    <article class="skill rv" data-rv style="--accent:var(--c-amber)">
-      <span class="skill-num">02</span>
-      <h3><a href="#projects" data-goto-cat="packaging">Packaging Designer <svg class="skill-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h3>
-      <p class="skill-tagline">Shelf presence that sells.</p>
-      <div class="more" id="more-packaging"><div class="more-inner">
-        <p>Labels and boxes that read at a glance and arrive print-ready.</p>
-        <ul class="skill-tags"><li>Labels</li><li>Boxes</li><li>Print-ready files</li></ul>
-      </div></div>
-      <button type="button" class="more-toggle" aria-expanded="false" aria-controls="more-packaging"><span class="pm" aria-hidden="true"></span><span class="label">See more</span></button>
-    </article>
-    <article class="skill rv" data-rv style="--accent:var(--c-cyan)">
-      <span class="skill-num">03</span>
-      <h3><a href="#projects" data-goto-cat="logo">Branding <svg class="skill-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h3>
-      <p class="skill-tagline">Marks that get remembered.</p>
-      <div class="more" id="more-branding"><div class="more-inner">
-        <p>Logos and visual identities, with clear rules for colour and type.</p>
-        <ul class="skill-tags"><li>Logo</li><li>Guidelines</li><li>Stationery</li></ul>
-      </div></div>
-      <button type="button" class="more-toggle" aria-expanded="false" aria-controls="more-branding"><span class="pm" aria-hidden="true"></span><span class="label">See more</span></button>
-    </article>
-    <article class="skill rv" data-rv style="--accent:var(--c-mint)">
-      <span class="skill-num">04</span>
-      <h3><a href="#projects" data-goto-cat="art">3D &amp; Video Editor <svg class="skill-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h3>
-      <p class="skill-tagline">Motion that brings ideas to life.</p>
-      <div class="more" id="more-3d-video"><div class="more-inner">
-        <p>3D visuals and edited videos that add depth and movement to a brand.</p>
-        <ul class="skill-tags"><li>3D</li><li>Video editing</li><li>Motion</li></ul>
-      </div></div>
-      <button type="button" class="more-toggle" aria-expanded="false" aria-controls="more-3d-video"><span class="pm" aria-hidden="true"></span><span class="label">See more</span></button>
-    </article>
-    <!-- 05 · And More — leads to ALL projects (data-goto-cat="all") -->
-    <article class="skill rv" data-rv style="--accent:var(--c-rose)">
-      <span class="skill-num">05</span>
-      <h3><a href="#projects" data-goto-cat="all">And More <svg class="skill-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></h3>
-      <p class="skill-tagline">See everything I've designed.</p>
-      <a class="skill-cta" href="#projects" data-goto-cat="all">View all work <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-    </article>
-  </div>
-  </div></div>
-
-  <!-- Experience -->
-  <div class="career-sub rv" data-rv><span class="logos-label">Experience</span></div>
-  <div class="timeline">
-    <!-- EDIT: replace the dates, roles and places with your own. Copy an <article class="tl-item"> block to add more
-         (give its "more" block and button a new unique id). -->
-    <article class="tl-item rv" data-rv>
-      <span class="tl-date now">20XX — Present</span>
-      <div class="tl-body">
-        <h3>Graphic Designer <span>· Freelance · Ho Chi Minh City</span></h3>
-        <div class="more" id="tl-1"><div class="more-inner">
-          <p>Social content, logos, typography and packaging for F&amp;B and trading brands.</p>
-          <ul>
-            <li>Consistent post systems for brand feeds</li>
-            <li>Logo and packaging delivered print-ready</li>
-          </ul>
-        </div></div>
-        <button type="button" class="more-toggle" aria-expanded="false" aria-controls="tl-1"><span class="pm" aria-hidden="true"></span><span class="label">See more</span></button>
-      </div>
-    </article>
-    <article class="tl-item rv" data-rv>
-      <span class="tl-date">20XX — 20XX</span>
-      <div class="tl-body">
-        <h3>Graphic Designer <span>· Company name</span></h3>
-        <div class="more" id="tl-2"><div class="more-inner">
-          <p>One thing you delivered here — and the result it had.</p>
-        </div></div>
-        <button type="button" class="more-toggle" aria-expanded="false" aria-controls="tl-2"><span class="pm" aria-hidden="true"></span><span class="label">See more</span></button>
-      </div>
-    </article>
-    <article class="tl-item rv" data-rv>
-      <span class="tl-date">20XX — 20XX</span>
-      <div class="tl-body">
-        <h3>Graphic Design <span>· Dong Nai College of Decorative Arts</span></h3>
-        <div class="more" id="tl-3"><div class="more-inner">
-          <p>A foundation in composition, colour and typography.</p>
-        </div></div>
-        <button type="button" class="more-toggle" aria-expanded="false" aria-controls="tl-3"><span class="pm" aria-hidden="true"></span><span class="label">See more</span></button>
-      </div>
-    </article>
-  </div>
-</section>
-
-<!-- ============ PROJECTS ============ -->
-<section id="projects">
-  <div class="section-head">
-    <h2>My Projects</h2>
-    <span class="idx">03 — Projects</span>
-  </div>
-  <div class="project-filters" id="projectFilters"></div>
-  <div class="project-grid" id="projectGrid"></div>
-  <div class="project-grid-actions" id="projectActions"></div>
-</section>
-
-<!-- ============ CONTACT ============ -->
-<section id="contact">
-  <div class="contact-wrap">
-    <h2>Let's create<br>something remarkable.</h2>
-    <div class="contact-links">
-      <a href="mailto:nguyenanhvucvv@gmail.com">nguyenanhvucvv@gmail.com</a>
-      <a href="https://www.instagram.com/visualby_rg_peace/" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://www.behance.net/vnguyn169" target="_blank" rel="noopener">Behance</a>
-    </div>
-  </div>
-</section>
-
-<footer>© 2026 — Yourname. Portfolio built with glow.</footer>
-
-<!-- ============ LIGHTBOX (full-screen image view) ============ -->
-<div class="lightbox" id="lightbox" aria-hidden="true">
-  <button class="lightbox-close" id="lightboxClose" aria-label="Close">✕</button>
-  <img id="lightboxImg" src="" alt="">
+  <button class="lb-btn lb-prev" id="lbPrev" type="button" aria-label="Ảnh trước">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
+  <button class="lb-btn lb-next" id="lbNext" type="button" aria-label="Ảnh sau">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+  </button>
+  <figure>
+    <img id="lbImg" alt="">
+    <figcaption><strong id="lbTitle"></strong><span id="lbCap"></span></figcaption>
+  </figure>
 </div>
 
-<!-- ============ CONTACT MODAL (glass / blur, opens on any "Contact" click) ============ -->
-<div class="contact-overlay" id="contactOverlay" aria-hidden="true">
-  <div class="contact-card" role="dialog" aria-modal="true" aria-labelledby="contactCardName">
-    <span class="contact-card-glow" aria-hidden="true"></span>
-    <span class="contact-card-glow two" aria-hidden="true"></span>
-    <button class="contact-card-close" id="contactCardClose" aria-label="Close">✕</button>
-    <div class="contact-card-top">
-      <div class="contact-card-eyebrow">
-        <b>Contact</b>
-        <span>Thông tin liên hệ</span>
+<!-- ===================== DETAILS ===================== -->
+<section class="details" id="details">
+  <div class="section-inner wide">
+
+    <p class="kicker">Thông tin lễ cưới</p>
+    <h2 class="heading">Details</h2>
+
+    <div class="cards">
+
+      <div class="card">
+        <span class="tag">Nhà trai</span>
+        <h3>Địa điểm tổ chức</h3>
+        <p>Trung Hưng, Cát Tiên 3<br>Lâm Đồng</p>
+        <a class="btn-outline" href="https://maps.app.goo.gl/4WPQturNabsKksiJ7" target="_blank" rel="noopener">
+          Xem bản đồ
+        </a>
+      </div>
+
+      <div class="card">
+        <span class="tag">Nhà gái</span>
+        <h3>Địa điểm tổ chức</h3>
+        <p>[Địa chỉ nhà gái]<br>Lâm Đồng</p>
+        <a class="btn-outline" href="https://maps.app.goo.gl/1SqD6iwSHtQEvNzMA" target="_blank" rel="noopener">
+          Xem bản đồ
+        </a>
+      </div>
+
+    </div>
+
+    <p class="kicker" style="margin-top:8px;">Lịch trình</p>
+
+    <div class="itinerary">
+      <div class="itin-item">
+        <span class="time">14:30</span>
+        <span class="what">Đón khách</span>
+      </div>
+      <div class="itin-item">
+        <span class="time">15:00</span>
+        <span class="what">Làm lễ</span>
+      </div>
+      <div class="itin-item">
+        <span class="time">17:00</span>
+        <span class="what">Tiệc mừng</span>
+      </div>
+      <div class="itin-item">
+        <span class="time">20:00</span>
+        <span class="what">Kết thúc</span>
       </div>
     </div>
-    <h3 id="contactCardName" class="contact-card-name">Nguyễn Anh Vũ</h3>
-    <ul class="contact-card-info">
-      <li><span class="ci-label">YOB</span><span class="ci-value">2002</span></li>
-      <li><span class="ci-label">LOC.</span><span class="ci-value">TP. HCM</span></li>
-      <li><span class="ci-label">Tel.</span><span class="ci-value"><a href="tel:0866715641">0866 715 641</a></span></li>
-      <li><span class="ci-label">E-mail</span><span class="ci-value"><a href="mailto:nguyenanhvucvv@gmail.com">nguyenanhvucvv@gmail.com</a></span></li>
-    </ul>
+
+    <p style="text-align:center;font-size:13px;color:var(--ink-700);opacity:.7;margin-top:22px;">
+      [Placeholder — lịch trình mẫu, cập nhật lại giờ chính xác của bạn]
+    </p>
+
   </div>
-</div>
+</section>
+
+<!-- ===================== NOTES / DRESSCODE ===================== -->
+<section class="notes">
+  <div class="section-inner">
+
+    <div class="note-block">
+      <h3>Trang phục</h3>
+      <p>
+        [Placeholder — chưa có yêu cầu trang phục cụ thể.
+        Ví dụ: "Trang phục lịch sự, tông màu đất ấm được khuyến khích."]
+      </p>
+      <div class="palette" aria-hidden="true">
+        <span style="background:#22362c"></span>
+        <span style="background:#a3603f"></span>
+        <span style="background:#b28a52"></span>
+        <span style="background:#4a392c"></span>
+        <span style="background:#f8f2e6; border-color:rgba(0,0,0,.15)"></span>
+      </div>
+    </div>
+
+    <div class="note-block">
+      <h3>Một lời về quà mừng</h3>
+      <p>
+        Sự hiện diện của bạn là món quà quý giá nhất đối với chúng tôi.
+        Nếu bạn muốn gửi lời chúc phúc, chúng tôi xin trân trọng đón nhận.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== RSVP ===================== -->
+<section class="rsvp" id="rsvp">
+  <div class="section-inner">
+
+    <h2 class="heading on-dark">Gửi lời chúc</h2>
+
+    <form class="rsvp-form" id="rsvpForm">
+
+      <div class="field">
+        <label for="fullName">Họ và tên</label>
+        <input type="text" id="fullName" name="name" required autocomplete="name">
+      </div>
+
+      <div class="field">
+        <label for="message">Lời chúc gửi cô dâu &amp; chú rể</label>
+        <textarea id="message" name="message" rows="3"></textarea>
+      </div>
+
+      <button class="rsvp-submit" type="submit">Gửi lời chúc</button>
+
+      <p class="form-status" id="formStatus"></p>
+
+    </form>
+
+    <div class="wishes-wall" id="wishesWall"></div>
+    <p class="wishes-empty" id="wishesEmpty">Hãy là người đầu tiên gửi lời chúc!</p>
+
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="monogram">
+    <img src="./logovq.png" alt="Vũ Nguyễn &amp; Như Quỳnh">
+  </div>
+  <p class="names">VŨ NGUYỄN &amp; NHƯ QUỲNH<br>15.01.2027</p>
+  <p class="legal">Made with love for our wedding day</p>
+</footer>
 
 <script>
-/* =========================================================
-   0) YOUR PORTRAIT (About Me)
-   Paste a DIRECT image link between the quotes (same kind of link you use
-   for the project photos), e.g. "https://i.postimg.cc/xxxx/portrait.jpg".
-   Best with a 3:4 (portrait) photo. Leave "" to keep the placeholder.
-   PORTRAIT_POSITION moves the crop if your face is cut off:
-   "50% 20%" = horizontally centred, a bit towards the top.
-   ========================================================= */
-const PORTRAIT_SRC = "https://i.postimg.cc/1t1b2sxT/Layer-3.png";
-const PORTRAIT_POSITION = "50% 20%";
 
-/* =========================================================
-   1) CIRCULAR GALLERY (hero) — a rotating ring of 24 cards
-   Fill in your own photos in the array below.
-   - src: image path (e.g. "images/photo1.jpg" in your repo)
-   - glow: glow color on hover (hex code)
-   ========================================================= */
-const orbitImages = [
-  { src: "https://tinyurl.com/4wr6h69c", glow: "#ff6fc9" },
-  { src: "https://tinyurl.com/ypj4pyss", glow: "#35d0ff" },
-  { src: "https://tinyurl.com/569nt6ck", glow: "#9797a3" },
-  { src: "https://tinyurl.com/3r8k25j8", glow: "#8a6bff" },
-  { src: "https://tinyurl.com/mu32skpp", glow: "#ff5b66" },
-  { src: "https://tinyurl.com/yfs2k5ce", glow: "#ffb238" },
-  { src: "https://tinyurl.com/3n27f2r5", glow: "#6f8bff" },
-  { src: "https://tinyurl.com/cf82n3yu", glow: "#39e3a6" },
-  { src: "https://tinyurl.com/ytrbbzuk", glow: "#ff5b66" },
-  { src: "https://tinyurl.com/y4znps8w", glow: "#ffb238" },
-  { src: "https://tinyurl.com/bdczefdy", glow: "#ff6fc9" },
-  { src: "https://tinyurl.com/we42hb33", glow: "#9797a3" },
-  { src: "https://tinyurl.com/mvefxjc4", glow: "#8a6bff" },
-  { src: "https://tinyurl.com/mr2wfzt3", glow: "#35d0ff" },
-  { src: "https://tinyurl.com/3mj9pejh", glow: "#ff6fc9" },
-  { src: "https://tinyurl.com/3vajxne5", glow: "#ffb238" },
-  { src: "https://tinyurl.com/3dceusrn", glow: "#39e3a6" },
-  { src: "https://tinyurl.com/3m9mawum", glow: "#ff5b66" },
-  { src: "https://tinyurl.com/3cy9b8bv", glow: "#6f8bff" },
-  { src: "https://tinyurl.com/mr3arfed", glow: "#8a6bff" },
-  { src: "https://tinyurl.com/mtkrydcm", glow: "#9797a3" },
-  { src: "https://tinyurl.com/mrwnev8e", glow: "#35d0ff" },
-  { src: "https://tinyurl.com/mr38nhst", glow: "#ffb238" },
-  { src: "https://tinyurl.com/4v5y24a9", glow: "#ff6fc9" }
-];
+  // Solid nav on scroll
+  const nav = document.getElementById('nav');
 
+  const onScroll = () => {
+    if (window.scrollY > window.innerHeight * 0.6)
+      nav.classList.add('solid');
+    else
+      nav.classList.remove('solid');
+  };
 
-const orbit = document.getElementById("orbit");
-const n = orbitImages.length;
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
-/* Geometry knobs. The cards sit EVENLY around a full circle
-   (360 / 12 = 30deg apart), whose center is below the composition —
-   only the upper part of that circle is ever inside the visible
-   .hero box (which clips overflow), so it reads as an arc while
-   really being a full ring underneath. */
-const DEG_PER_SECOND = 3.2;  // rotation speed — slow and continuous
 
-const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Countdown
+  const WEDDING_DATE = new Date('2027-01-15T15:00:00+07:00').getTime();
 
-let geo = { cx: 0, cy: 0, radius: 0 };
-const cardEls = []; // { el, baseAngle }
-let rotationOffset = 0;   // degrees; keeps accumulating, never resets — this is what makes resume seamless
-let hoverCount = 0;       // >0 while the pointer/focus is on any card
-let lightboxOpen = false; // true while the full-screen image view is open
-let restoringFocus = false; // true only while we programmatically return focus after closing the lightbox
-let lastTime = null;
+  const els = {
+    days: document.getElementById('cd-days'),
+    hours: document.getElementById('cd-hours'),
+    mins: document.getElementById('cd-mins'),
+    secs: document.getElementById('cd-secs')
+  };
 
-/* On narrow (portrait phone) viewports, orbit.clientWidth is much smaller
-   than on desktop while clientHeight stays tall, so a fixed RADIUS_RATIO
-   based on min(w,h) makes the ring shrink a lot more than the design
-   intends and can crowd/overlap the centered text. These values scale
-   the ring back up (and nudge its center) on narrower screens so the
-   arc keeps a similar visual weight at every breakpoint. */
-function getGeometryRatios(w){
-  // These were tuned against min(w,h), which on a landscape desktop
-  // equals h (so the ring reads as a broad, shallow arc above the
-  // text). On a PORTRAIT phone min(w,h) equals w instead, which is
-  // much smaller than h — so the same ratios put the circle's
-  // center too low and its top edge too close to (or under) the
-  // centered hero title. The values below are recalibrated so the
-  // topmost card lands at a roughly fixed fraction of the hero's
-  // HEIGHT (~15-16% down) regardless of how narrow the screen is,
-  // keeping a consistent gap above the title on every phone size.
-  if (w <= 480)  return { radius: 0.62, centerY: 0.50 };
-  if (w <= 760)  return { radius: 0.60, centerY: 0.55 };
-  return { radius: 0.66, centerY: 0.86 };
-}
+  function pad(n){ return String(n).padStart(2,'0'); }
 
-function measure(){
-  const w = orbit.clientWidth;
-  const h = orbit.clientHeight;
-  const { radius: RADIUS_RATIO, centerY: CENTER_Y_RATIO } = getGeometryRatios(w);
-  geo.cx = w / 2;
-  geo.cy = h * CENTER_Y_RATIO;
-  geo.radius = Math.min(w, h) * RADIUS_RATIO;
-}
+  function tick(){
+    const diff = WEDDING_DATE - Date.now();
 
-function buildCards(){
-  orbit.innerHTML = "";
-  cardEls.length = 0;
-  const step = 360 / n; // equal angular spacing, all cards, full circle
-  orbitImages.forEach((item, i) => {
-    const card = document.createElement("div");
-    card.className = "orbit-card";
-    card.style.setProperty("--glow", item.glow);
-    card.tabIndex = 0;
-
-    // Glow layer: same photo as the card, shown blurred and oversized
-    // behind it, so the glow color/light comes from the image itself.
-    const glow = document.createElement("div");
-    glow.className = "orbit-card-glow";
-    glow.style.backgroundImage = `url("${item.src}")`;
-    card.appendChild(glow);
-
-    const inner = document.createElement("div");
-    inner.className = "orbit-card-inner";
-    const img = document.createElement("img");
-    img.src = item.src;
-    img.alt = "Portfolio image " + (i + 1);
-    img.loading = "lazy";
-    inner.appendChild(img);
-    card.appendChild(inner);
-    orbit.appendChild(card);
-
-    // Pause the whole ring while this card is hovered/focused, resume when none are.
-    // (focus() called programmatically to restore keyboard focus after closing the
-    // lightbox is ignored here via `restoringFocus`, otherwise it would leave the
-    // ring stuck paused until the user happened to click/hover something else.)
-    const enter = () => { if (!restoringFocus) hoverCount++; };
-    const leave = () => { hoverCount = Math.max(0, hoverCount - 1); };
-    card.addEventListener("mouseenter", enter);
-    card.addEventListener("mouseleave", leave);
-    card.addEventListener("focus", enter);
-    card.addEventListener("blur", leave);
-
-    // Click (or Enter/Space when focused via keyboard) opens the image full-screen.
-    card.addEventListener("click", () => openLightbox(item.src, img.alt));
-    card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        openLightbox(item.src, img.alt);
-      }
-    });
-
-    cardEls.push({ el: card, baseAngle: i * step });
-  });
-}
-
-/* Positions + rotates every card for the CURRENT rotationOffset.
-   Every card shares the same offset and only differs by its fixed
-   baseAngle, so the whole ring always moves and holds together as
-   one rigid system — no card is ever animated independently.
-   Everything is written as a single `transform` (translate + rotate)
-   instead of left/top, so the browser can composite it on the GPU
-   each frame instead of re-computing layout for 12 elements — this
-   is what keeps the rotation jitter-free. */
-function render(){
-  cardEls.forEach(({ el, baseAngle }) => {
-    const angleDeg = baseAngle + rotationOffset;
-    const angleRad = angleDeg * Math.PI / 180;
-    const x = geo.cx + geo.radius * Math.sin(angleRad);
-    const y = geo.cy - geo.radius * Math.cos(angleRad);
-    // translate(x,y) places the card's center at its circle point;
-    // translate(-50%,-50%) accounts for left:0/top:0 being the box's
-    // own top-left corner; rotate() keeps the bottom edge tangent to
-    // the circle — same geometry as before, just composited as one
-    // transform for a smooth, constant-speed rotation.
-    el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%) rotate(${angleDeg}deg)`;
-  });
-}
-
-function tick(now){
-  if (lastTime === null) lastTime = now;
-  const dt = now - lastTime;
-  lastTime = now;
-
-  // Only advance the rotation while nothing is hovered/focused, and
-  // the lightbox isn't open. lastTime still updates while paused, so
-  // resuming never causes a jump.
-  if (hoverCount === 0 && !lightboxOpen && !prefersReducedMotion) {
-    rotationOffset = (rotationOffset + DEG_PER_SECOND * (dt / 1000)) % 360;
-  }
-  render();
-  requestAnimationFrame(tick);
-}
-
-function init(){
-  measure();
-  buildCards();
-  render();
-  requestAnimationFrame(tick);
-}
-init();
-
-window.addEventListener("resize", () => {
-  clearTimeout(window._orbitResizeT);
-  window._orbitResizeT = setTimeout(measure, 150); // re-measure only — rotationOffset (and cards) stay untouched
-});
-
-/* =========================================================
-   LIGHTBOX — click any card to view it full-screen
-   ========================================================= */
-const lightbox = document.getElementById("lightbox");
-const lightboxImg = document.getElementById("lightboxImg");
-const lightboxClose = document.getElementById("lightboxClose");
-let lastFocusedCard = null;
-
-function openLightbox(src, alt){
-  lastFocusedCard = document.activeElement;
-  lightboxImg.src = src;
-  lightboxImg.alt = alt || "";
-  lightbox.classList.add("active");
-  lightbox.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden"; // stop page scroll while viewing
-  lightboxOpen = true;
-  lightboxClose.focus();
-}
-
-function closeLightbox(){
-  lightbox.classList.remove("active");
-  lightbox.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
-  lightboxOpen = false;
-  if (lastFocusedCard) {
-    restoringFocus = true;
-    lastFocusedCard.focus();
-    restoringFocus = false;
-  }
-}
-
-lightboxClose.addEventListener("click", closeLightbox);
-// Click the dark backdrop (not the image itself) to close.
-lightbox.addEventListener("click", (e) => {
-  if (e.target === lightbox) closeLightbox();
-});
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && lightboxOpen) closeLightbox();
-});
-
-
-/* =========================================================
-   2) PROJECT GRID — square photo grid, split into categories
-   (filter tabs above the grid). Each photo declares a "category"
-   matching one of the keys in CATEGORIES below. When the selected
-   category has more than INITIAL_VISIBLE photos, the last tile is
-   blurred with a "•••" icon — click it to reveal the rest (photos
-   fade in from blurred to sharp).
-   Switching tabs: old photos blur out, new ones develop one by one
-   (blur → sharp, diagonal wave). Tune the timing in the constants below.
-   Add / edit your own project photos in the PROJECT_ITEMS array below.
-   ========================================================= */
-
-// Categories shown on the filter bar — the key must match the "category" of each photo in PROJECT_ITEMS.
-const CATEGORIES = [
-  { key: "all",       label: "All" },
-  { key: "social",    label: "Social Post" },
-  { key: "logo",      label: "Logo" },
-  { key: "typo",      label: "Typography" },
-  { key: "packaging", label: "Packaging" },
-  { key: "art",       label: "My Art Work" }
-];
-const CATEGORY_LABEL = Object.fromEntries(CATEGORIES.map(c => [c.key, c.label]));
-
-// Replace these ids with your own photos (src: "images/project-1.jpg", ...).
-// "category" decides which filter tab this photo belongs to.
-// "link" (optional): paste a URL here to make that photo clickable — it will
-// open in a new tab instead of the full-screen lightbox. Leave it as "" to
-// keep the default lightbox behavior for that photo.
-const PROJECT_ITEMS = [
-  // Dán LINK ẢNH TRỰC TIẾP vào `src`.
-  // category: social | logo | typo | packaging | art
-
-  { category: "social",    src: "https://i.postimg.cc/3wyyHbnC/766890097-1076784598201770-7577469320810769565-n.jpg" },
-  { category: "social",    src: "https://i.postimg.cc/0yJRRLLK/01.png" },
-  { category: "social",    src: "https://i.postimg.cc/26rPW337/02.png" },
-  { category: "social",    src: "https://i.postimg.cc/1zpk4DRX/03.png" },
-  { category: "social",    src: "https://i.postimg.cc/W4LR25Vb/04.png" },
-  { category: "social",    src: "https://i.postimg.cc/C179sYfX/05.png" },
-  { category: "social",    src: "https://i.postimg.cc/3R1zF7vK/06.png" },
-  { category: "social",    src: "https://i.postimg.cc/jq8GWxTy/07.png" },
-  { category: "social",    src: "https://i.postimg.cc/7Lycvb1v/08.png" },
-  { category: "social",    src: "https://i.postimg.cc/VNcTy59k/09.png" },
-  { category: "social",    src: "https://i.postimg.cc/nLt58MKZ/10.png" },
-  { category: "social",    src: "https://i.postimg.cc/504R0Gks/11.png" },
-  { category: "social",    src: "https://i.postimg.cc/Y9rs9VyX/12.png" },
-  { category: "social",    src: "https://i.postimg.cc/tTqMTfmD/13.png" },
-  { category: "social",    src: "https://i.postimg.cc/d1gHCbrK/p1.png" },
-  { category: "social",    src: "https://i.postimg.cc/0QhWSTD9/p1-01.png" },
-  { category: "social",    src: "https://i.postimg.cc/KzCqT6Bx/p1-02.png" },
-  { category: "social",    src: "https://i.postimg.cc/KzCqT6B2/p1-03.png" },
-  { category: "social",    src: "https://i.postimg.cc/85xKv2Mr/p1-04.png" },
-  { category: "social",    src: "https://i.postimg.cc/5yvPSsSL/p1-05.png" },
-  { category: "social",    src: "https://i.postimg.cc/vT9Pt0tP/p1-06.png" },
-  { category: "social",    src: "https://i.postimg.cc/nr7dG3G3/p1-07.png" },
-  { category: "social",    src: "https://i.postimg.cc/NGrPt0vc/p1-08.png" },
-  { category: "social",    src: "https://i.postimg.cc/qqnmx1xY/p1-09.png" },
-  { category: "social",    src: "https://i.postimg.cc/HW7PmL1H/p1-10.png" },
-  { category: "social",    src: "https://i.postimg.cc/xjbFQdVT/p1-11.png" },
-  { category: "social",    src: "https://i.postimg.cc/44hFG3Rn/p1-12.png" },
-  { category: "social",    src: "https://i.postimg.cc/2jBXY5NQ/p1-13.png" },
-  { category: "social",    src: "https://i.postimg.cc/Pf8FHqn4/p1-14.png" },
-  { category: "social",    src: "https://i.postimg.cc/YqKDCwtY/p1-15.png" },
-  { category: "social",    src: "https://i.postimg.cc/WbLY1PsG/p1-16.png" },
-  { category: "social",    src: "https://i.postimg.cc/3J5fxH3t/p1-17.png" },
-
-  { category: "logo",      src: "" },
-  { category: "logo",      src: "" },
-  { category: "logo",      src: "" },
-  { category: "logo",      src: "" },
-  { category: "logo",      src: "" },
-  { category: "logo",      src: "" },
-
-  { category: "typo",      src: "" },
-  { category: "typo",      src: "" },
-  { category: "typo",      src: "" },
-  { category: "typo",      src: "" },
-  { category: "typo",      src: "" },
-  { category: "typo",      src: "" },
-
-  { category: "packaging", src: "" },
-  { category: "packaging", src: "" },
-  { category: "packaging", src: "" },
-  { category: "packaging", src: "" },
-  { category: "packaging", src: "" },
-  { category: "packaging", src: "" },
-
-  { category: "art",       src: "" },
-  { category: "art",       src: "" },
-  { category: "art",       src: "" },
-  { category: "art",       src: "" },
-  { category: "art",       src: "" },
-  { category: "art",       src: "" },
-  { category: "art",       src: "" }
-];
-
-const projects = PROJECT_ITEMS
-  .filter(item => item.src && item.src.trim() !== "")
-  .map(item => ({
-    src: item.src.trim(),
-    category: item.category,
-    tag: CATEGORY_LABEL[item.category] || item.category
-  }));
-
-const grid = document.getElementById("projectGrid");
-const actions = document.getElementById("projectActions");
-const filtersEl = document.getElementById("projectFilters");
-const INITIAL_VISIBLE = 24; // 8 photos / row × 3 rows (only applies when a category has more photos than this)
-
-// ---- animation tuning (keep LEAVE_MS in sync with .is-leaving in CSS) ----
-const WAVE_STEP_MS   = 60;  // delay between each diagonal "step" of the reveal wave
-const WAVE_MAX_STEPS = 12;  // caps the wave length so big grids never feel slow
-const SEQ_STEP_MS    = 50;  // per-photo delay when "show more" reveals a batch
-const SEQ_MAX_STEPS  = 16;
-const LEAVE_MS       = 420; // duration of the blur-out
-const LEAVE_STEP_MS  = 14;  // stagger of the blur-out
-const RESIZE_MS      = 900; // a bit longer than the .project-grid height transition
-
-let projectsExpanded = false;
-let activeCategory = "all";
-let renderToken = 0;   // bumped on every (re)build so stale timers / image loads from an older render are ignored
-let switchTimer = null;
-let resizeTimer = null;
-
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-// Resolves once the image is loaded AND decoded (or has failed), so a photo is
-// never revealed half-loaded and the blur → sharp effect is always visible.
-function whenImageReady(img){
-  return new Promise(resolve => {
-    const decoded = () => (img.decode ? img.decode().catch(() => {}) : Promise.resolve()).then(resolve);
-    if (img.complete){
-      img.naturalWidth > 0 ? decoded() : resolve();
-    } else {
-      img.addEventListener("load", decoded, { once: true });
-      img.addEventListener("error", resolve, { once: true });
-    }
-  });
-}
-
-function gridColumns(){
-  return getComputedStyle(grid).gridTemplateColumns.split(" ").filter(Boolean).length || 1;
-}
-
-// Diagonal distance from the top-left corner (0,1,2,…) — drives the wave.
-function waveStep(index, cols){
-  return Math.floor(index / cols) + (index % cols);
-}
-
-// "Smooth scene change" between tabs: the current photos blur out, the new
-// category is swapped in, then its photos develop one by one.
-function switchCategory(key){
-  activeCategory = key;
-  projectsExpanded = false; // reset to the collapsed state every time the category changes
-  updateFilters();
-
-  renderToken++;            // cancel any reveal that is still waiting from the previous render
-  clearTimeout(switchTimer);
-
-  const cards = grid.querySelectorAll(".project-card");
-  if (prefersReducedMotion || cards.length === 0){
-    rebuildGrid({ revealFrom: 0, mode: "wave" });
-    return;
-  }
-
-  const cols = gridColumns();
-  let maxStep = 0;
-  grid.classList.add("is-switching");
-  cards.forEach((card, i) => {
-    const step = Math.min(waveStep(i, cols), WAVE_MAX_STEPS);
-    maxStep = Math.max(maxStep, step);
-    card.style.setProperty("--out", (step * LEAVE_STEP_MS) + "ms");
-    card.classList.remove("is-pending", "is-in");
-    card.classList.add("is-leaving");
-  });
-
-  switchTimer = setTimeout(() => {
-    rebuildGrid({ revealFrom: 0, mode: "wave" });
-    grid.classList.remove("is-switching");
-  }, LEAVE_MS + maxStep * LEAVE_STEP_MS);
-}
-
-// Builds the filter buttons once; afterwards only their state changes, so the
-// active pill can fade smoothly between tabs (and keyboard focus is kept).
-function buildFilters(){
-  filtersEl.innerHTML = "";
-  CATEGORIES.forEach(cat => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "filter-btn";
-    btn.dataset.key = cat.key;
-    btn.textContent = cat.label;
-    btn.addEventListener("click", () => {
-      if (activeCategory === cat.key) return;
-      switchCategory(cat.key);
-    });
-    filtersEl.appendChild(btn);
-  });
-  updateFilters();
-}
-
-function updateFilters(){
-  filtersEl.querySelectorAll(".filter-btn").forEach(btn => {
-    const on = btn.dataset.key === activeCategory;
-    btn.classList.toggle("active", on);
-    btn.setAttribute("aria-pressed", on ? "true" : "false");
-  });
-}
-
-// Rebuilds the grid and glides its height from the old number of rows to the
-// new one, so everything below it slides instead of jumping.
-function rebuildGrid(opts){
-  const fromHeight = grid.offsetHeight;
-  buildProjectGrid(opts);
-  if (prefersReducedMotion) return;
-
-  grid.style.height = "auto";
-  const toHeight = grid.offsetHeight;
-  clearTimeout(resizeTimer);
-  if (Math.abs(toHeight - fromHeight) < 2){
-    grid.style.height = "";
-    grid.classList.remove("is-resizing");
-    return;
-  }
-  grid.classList.add("is-resizing");
-  grid.style.height = fromHeight + "px";
-  void grid.offsetHeight;                 // commit the starting height
-  grid.style.height = toHeight + "px";
-  resizeTimer = setTimeout(() => {
-    grid.style.height = "";
-    grid.classList.remove("is-resizing");
-  }, RESIZE_MS);
-}
-
-// opts.revealFrom : index of the first photo that plays the reveal animation
-//                   (Infinity = none, everything just appears)
-// opts.mode       : "wave" (diagonal, for tab changes) | "sequence" (row by row, for "show more")
-function buildProjectGrid(opts = {}){
-  const revealFrom = opts.revealFrom === undefined ? Infinity : opts.revealFrom;
-  const mode = opts.mode || "wave";
-  const token = ++renderToken;
-
-  grid.innerHTML = "";
-  actions.innerHTML = "";
-  const filtered = activeCategory === "all"
-    ? projects
-    : projects.filter(p => p.category === activeCategory);
-  const hasMore = filtered.length > INITIAL_VISIBLE;
-  const showCount = projectsExpanded ? filtered.length : INITIAL_VISIBLE;
-  const animated = []; // [{ card, img, index }]
-
-  filtered.slice(0, showCount).forEach((p, i) => {
-    const isMoreTile = !projectsExpanded && hasMore && i === INITIAL_VISIBLE - 1;
-    // Every `src` is the actual image URL.
-    // There is no separate project/link URL anymore.
-    // Clicking a normal tile opens the image in the existing lightbox.
-    const card = document.createElement("div");
-    card.className = "project-card" + (isMoreTile ? " more-tile" : "");
-
-    const img = document.createElement("img");
-    img.src = p.src;
-    img.alt = p.tag || ("Project " + (i + 1));
-    img.loading = "lazy";
-    card.appendChild(img);
-
-    if (isMoreTile){
-      // Last tile: photo blurred, "•••" icon overlaid — click to reveal more
-      const remaining = filtered.length - INITIAL_VISIBLE + 1;
-      const overlay = document.createElement("div");
-      overlay.className = "more-icon";
-      overlay.innerHTML = `<span class="dots">•••</span><span class="more-count">+${remaining} photos</span>`;
-      card.appendChild(overlay);
-      card.setAttribute("role", "button");
-      card.setAttribute("tabindex", "0");
-      card.setAttribute("aria-label", `Show ${remaining} more photos`);
-      const expand = () => {
-        projectsExpanded = true;
-        rebuildGrid({ revealFrom: INITIAL_VISIBLE - 1, mode: "sequence" });
-      };
-      card.addEventListener("click", expand);
-      card.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); expand(); }
-      });
-    } else {
-      if (p.tag){
-        const tag = document.createElement("span");
-        tag.className = "tag";
-        tag.textContent = p.tag;
-        card.appendChild(tag);
-      }
-      card.addEventListener("click", () => openLightbox(p.src, img.alt));
-    }
-
-    if (!prefersReducedMotion && i >= revealFrom){
-      card.classList.add("is-pending"); // invisible until its turn in the reveal
-      animated.push({ card, img, index: i });
-    }
-    grid.appendChild(card);
-  });
-
-  if (filtered.length === 0){
-    const empty = document.createElement("div");
-    empty.className = "project-empty";
-    empty.textContent = "New work coming soon.";
-    grid.appendChild(empty);
-  }
-
-  if (projectsExpanded && hasMore){
-    // Compact "show less" button below the grid — doesn't take up a tile slot
-    const collapseBtn = document.createElement("button");
-    collapseBtn.type = "button";
-    collapseBtn.className = "collapse-btn";
-    collapseBtn.innerHTML = `<span class="chevron">⌃</span> Show less`;
-    collapseBtn.setAttribute("aria-label", "Show fewer photos");
-    collapseBtn.addEventListener("click", () => {
-      projectsExpanded = false;
-      rebuildGrid({ revealFrom: Infinity });
-      // scroll the user back to the top of the projects area instead of leaving them at the bottom of a grid that just disappeared
-      document.getElementById("projects").scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
-    });
-    actions.appendChild(collapseBtn);
-  }
-
-  // Reveal: each photo waits for BOTH its turn in the wave and its image being
-  // ready, then plays the blur → sharp animation (see .is-in in CSS).
-  if (animated.length){
-    const cols = gridColumns();
-    animated.forEach(({ card, img, index }, k) => {
-      const delay = mode === "sequence"
-        ? Math.min(k, SEQ_MAX_STEPS) * SEQ_STEP_MS
-        : Math.min(waveStep(index, cols), WAVE_MAX_STEPS) * WAVE_STEP_MS;
-      Promise.all([sleep(delay), whenImageReady(img)]).then(() => {
-        if (token !== renderToken) return; // a newer render replaced this grid
-        card.classList.remove("is-pending");
-        card.classList.add("is-in");
-      });
-    });
-  }
-}
-
-buildFilters();
-buildProjectGrid(); // first paint: no animation
-
-
-/* =========================================================
-   3) PORTRAIT LOADER + SCROLL REVEAL
-   ========================================================= */
-(function initPortrait(){
-  const img = document.getElementById("portraitImg");
-  const src = (PORTRAIT_SRC || "").trim();
-  if (!img || !src) return;                 // no link yet → the placeholder stays
-  img.style.objectPosition = PORTRAIT_POSITION;
-  img.addEventListener("load", () => img.classList.add("is-loaded")); // fades in from blur
-  img.addEventListener("error", () => { img.style.display = "none"; }); // bad link → placeholder stays
-  img.src = src;
-})();
-
-/* =========================================================
-   4) CAREER — "See more" toggles + title → jump to that category's photos
-   ========================================================= */
-// Scrolls down to the Projects section, waits until the scroll has settled
-// (so the visitor actually sees it), then switches to the requested category —
-// the photos blur out / develop right in front of them.
-function goToProjects(catKey){
-  const target = document.getElementById("projects");
-  const switchNow = () => { if (catKey && catKey !== activeCategory) switchCategory(catKey); };
-
-  if (prefersReducedMotion){
-    target.scrollIntoView({ behavior: "auto", block: "start" });
-    switchNow();
-    return;
-  }
-  const alreadyNear = Math.abs(target.getBoundingClientRect().top) < 120;
-  target.scrollIntoView({ behavior: "smooth", block: "start" });
-  if (alreadyNear){ setTimeout(switchNow, 250); return; }
-
-  let last = window.scrollY, still = 0, moved = false;
-  const t0 = performance.now();
-  (function tick(){
-    const y = window.scrollY;
-    if (Math.abs(y - last) > 1){ moved = true; still = 0; } else { still++; }
-    last = y;
-    if ((moved && still >= 8) || performance.now() - t0 > 3200){
-      setTimeout(switchNow, 120);
+    if (diff <= 0){
+      els.days.textContent = '00';
+      els.hours.textContent = '00';
+      els.mins.textContent = '00';
+      els.secs.textContent = '00';
       return;
     }
-    requestAnimationFrame(tick);
-  })();
-}
 
-// "Contact" links (nav, hero button, career button) open a centered glass
-// modal with contact details instead of just scrolling to the section.
-(function initContactModal(){
-  const overlay = document.getElementById("contactOverlay");
-  const closeBtn = document.getElementById("contactCardClose");
-  if (!overlay || !closeBtn) return;
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    const secs = Math.floor((diff % 60000) / 1000);
 
-  const openModal = () => {
-    overlay.classList.add("is-open");
-    overlay.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-  };
-  const closeModal = () => {
-    overlay.classList.remove("is-open");
-    overlay.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
-  };
-
-  document.querySelectorAll('a[href="#contact"]').forEach((a) => {
-    a.addEventListener("click", (e) => {
-      e.preventDefault();
-      openModal();
-    });
-  });
-  closeBtn.addEventListener("click", closeModal);
-  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && overlay.classList.contains("is-open")) closeModal();
-  });
-})();
-
-document.addEventListener("click", (e) => {
-  // "Years of experience" → reveal / hide the Roles grid below it
-  const rolesBtn = e.target.closest(".roles-toggle");
-  if (rolesBtn){
-    const panel = document.getElementById(rolesBtn.getAttribute("aria-controls"));
-    const open = !panel.classList.contains("is-open");
-    panel.classList.toggle("is-open", open);
-    rolesBtn.setAttribute("aria-expanded", open ? "true" : "false");
-    if (open){
-      setTimeout(() => {
-        rolesBtn.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
-      }, 50);
-    }
-    return;
+    els.days.textContent = pad(days);
+    els.hours.textContent = pad(hours);
+    els.mins.textContent = pad(mins);
+    els.secs.textContent = pad(secs);
   }
-  // "See more" / "See less"
-  const toggle = e.target.closest(".more-toggle");
-  if (toggle){
-    const box = toggle.closest(".skill, .tl-item");
-    const open = !box.classList.contains("is-open");
-    box.classList.toggle("is-open", open);
-    toggle.setAttribute("aria-expanded", open ? "true" : "false");
-    toggle.querySelector(".label").textContent = open ? "See less" : "See more";
-    return;
+
+  tick();
+  setInterval(tick, 1000);
+
+
+  // Tường lời chúc — lưu mỗi lời chúc thành một "con tem" vĩnh viễn trên
+  // Firebase Realtime Database (miễn phí), không cần gửi qua Gmail.
+  //
+  // Cách kích hoạt (miễn phí, ~5 phút):
+  // 1. Vào https://console.firebase.google.com → Tạo dự án mới (Add project)
+  // 2. Trong dự án → Build → Realtime Database → Create Database
+  //    (chọn chế độ "Start in test mode" để bắt đầu nhanh)
+  // 3. Vào Project settings (biểu tượng bánh răng) → General → cuộn xuống
+  //    "Your apps" → bấm biểu tượng </> để tạo Web app → copy object
+  //    firebaseConfig hiện ra
+  // 4. Dán object đó thay cho FIREBASE_CONFIG bên dưới
+  // 5. (Khuyên dùng) Trong Realtime Database → Rules, giới hạn lại thành:
+  //      { "rules": { "wishes": { ".read": true, ".write": true } } }
+  //    để chỉ mục "wishes" công khai, phần còn lại được khoá.
+  //
+  // Lưu ý: nếu bạn đang xem qua bản xem trước của claude.ai, trình duyệt có
+  // thể chặn kết nối tới Firebase do chính sách bảo mật của claude.ai.
+  // Khi bạn tải file này lên website riêng của mình (GitHub Pages, v.v.),
+  // phần lưu trữ sẽ hoạt động đầy đủ và vĩnh viễn cho mọi khách truy cập.
+
+  const FIREBASE_CONFIG = {
+    apiKey: 'AIzaSyDrvDSXMpGqFvivC8z6ES3TVHpNSaMF23s',
+    databaseURL: 'https://data-5f418-default-rtdb.firebaseio.com',
+    projectId: 'data-5f418'
+  };
+
+  const form = document.getElementById('rsvpForm');
+  const status = document.getElementById('formStatus');
+  const wall = document.getElementById('wishesWall');
+  const emptyMsg = document.getElementById('wishesEmpty');
+
+  const firebaseReady = !FIREBASE_CONFIG.apiKey.startsWith('REPLACE_')
+    && typeof firebase !== 'undefined';
+
+  let wishesRef = null;
+
+  if (firebaseReady){
+    firebase.initializeApp(FIREBASE_CONFIG);
+    wishesRef = firebase.database().ref('wishes');
   }
-  // Title → matching photos
-  const link = e.target.closest("[data-goto-cat]");
-  if (link){
+
+  let stampCount = 0;
+
+  function formatWishTime(ts){
+    if (!ts) return '';
+    const d = new Date(ts);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${dd}/${mm}/${yyyy} · ${hh}:${min}`;
+  }
+
+  function addStamp(name, message, time){
+    emptyMsg.style.display = 'none';
+
+    const rot = (Math.random() * 8 - 4).toFixed(1);
+    // Cascade stamps in one after another instead of popping in all at once,
+    // capped so a long list doesn't leave the last ones waiting too long.
+    const delay = Math.min(stampCount * 0.08, 0.8);
+    stampCount++;
+
+    const el = document.createElement('div');
+    el.className = 'stamp';
+    el.style.setProperty('--rot', rot + 'deg');
+    el.style.setProperty('--delay', delay + 's');
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'stamp-name';
+    nameEl.textContent = name;
+
+    const msgEl = document.createElement('span');
+    msgEl.className = 'stamp-msg';
+    msgEl.textContent = message || '💌';
+
+    el.appendChild(nameEl);
+    el.appendChild(msgEl);
+
+    const ts = time || Date.now();
+    const dateEl = document.createElement('span');
+    dateEl.className = 'stamp-date';
+    dateEl.textContent = formatWishTime(ts);
+    el.appendChild(dateEl);
+
+    wall.appendChild(el);
+  }
+
+  if (wishesRef){
+    wishesRef
+      .orderByChild('time')
+      .on('child_added', (snap) => {
+        const w = snap.val();
+        addStamp(w.name, w.message, w.time);
+      });
+  }
+
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
-    goToProjects(link.dataset.gotoCat);
+
+    const name = document.getElementById('fullName').value.trim();
+    const message = document.getElementById('message').value.trim();
+
+    if (!name){
+      status.textContent = 'Vui lòng điền họ và tên.';
+      status.style.color = '#e0a0a0';
+      return;
+    }
+
+    if (!firebaseReady){
+      status.textContent = 'Demo: chưa kết nối lưu trữ. Xem hướng dẫn trong mã nguồn để kích hoạt.';
+      status.style.color = '#d7b781';
+      addStamp(name, message);
+      form.reset();
+      return;
+    }
+
+    status.textContent = 'Đang lưu...';
+
+    wishesRef.push({ name, message, time: Date.now() })
+      .then(() => {
+        status.textContent = 'Cảm ơn bạn! Lời chúc đã được lưu lại.';
+        status.style.color = '#d7b781';
+        form.reset();
+      })
+      .catch(() => {
+        status.textContent = 'Có lỗi xảy ra, vui lòng thử lại sau.';
+        status.style.color = '#e0a0a0';
+      });
+  });
+
+</script>
+
+<script>
+/* =====================================================================
+   ALBUM ẢNH — thẻ xếp chồng tự chạy
+   ---------------------------------------------------------------------
+   CÁCH GÁN ẢNH: thay từng dòng trong PHOTO_LINKS bằng link ảnh của bạn.
+   Có sẵn 40 ô, thêm hoặc bớt dòng tuỳ ý (nên từ 4 ảnh trở lên).
+
+   Link dùng được:
+     • Đường dẫn tới file trong cùng thư mục web, ví dụ './photos/01.jpg'
+       (cách chắc nhất: bỏ ảnh vào thư mục "photos" cạnh index.html)
+     • Link trực tiếp tới file ảnh (.jpg .png .webp), ví dụ
+       'https://i.imgur.com/abc123.jpg'
+   Ô nào để trống '' sẽ hiện khung "Ảnh của bạn tại đây".
+   Ảnh nào không tải được sẽ tự động bị bỏ qua, không làm hỏng vòng lướt.
+   ===================================================================== */
+(function(){
+
+  const PHOTO_LINKS = [
+    'https://i.postimg.cc/8c7cRcJV/64C4FAF5-9030-407C-9191-C88A5F09D638.jpg',
+    'https://i.postimg.cc/vT4TrT1p/737B1357-4FBF-42B1-8153-2DD0B9E5FE36.jpg',
+    'https://i.postimg.cc/Y0v0604T/9C9B2A72-8EFA-47A3-9EB2-A412D2FCEBA4.jpg',
+    'https://i.postimg.cc/NMf50pQj/IMG-0049.jpg',
+    'https://i.postimg.cc/LX6nsNm4/IMG-0086.jpg',
+    'https://i.postimg.cc/TwYpPCTR/IMG-0544.jpg',
+    'https://i.postimg.cc/L5GXNSL6/IMG-0583.jpg',
+    'https://i.postimg.cc/QtxHM0jj/IMG-0722.jpg',
+    'https://i.postimg.cc/NFZMptmg/IMG-0888.jpg',
+    'https://i.postimg.cc/qqNqsqhR/IMG-0914.jpg',
+    'https://i.postimg.cc/C591m0k1/IMG-1136.png',
+    'https://i.postimg.cc/Jn4GhPRM/IMG-1506.jpg',
+    'https://i.postimg.cc/pTGy5zdf/IMG-1558.jpg',
+    'https://i.postimg.cc/V6LdNDzQ/IMG-1632.jpg',
+    'https://i.postimg.cc/T1K1V1L6/IMG-1782.jpg',
+    'https://i.postimg.cc/FRs7KDN2/IMG-2733.jpg',
+    'https://i.postimg.cc/268V52rs/IMG-2962.jpg',
+    'https://i.postimg.cc/1zK8PL1s/IMG-3243.jpg',
+    'https://i.postimg.cc/CK4RYWTW/IMG-3587.jpg',
+    'https://i.postimg.cc/0NCzxLRB/IMG-3782.jpg',
+    'https://i.postimg.cc/j2D2H2W8/IMG-4389.jpg',
+    'https://i.postimg.cc/1X8XGXgC/IMG-4411.jpg',
+    'https://i.postimg.cc/431YZrk0/IMG-4667-(1).jpg',
+    'https://i.postimg.cc/1zK8PLh2/IMG-4968.jpg',
+    'https://i.postimg.cc/5tmX1Zdg/IMG-5067.jpg',
+    'https://i.postimg.cc/tJsJ3J1z/IMG-5270.jpg',
+    'https://i.postimg.cc/brZrxrGT/IMG-5493.jpg',
+    'https://i.postimg.cc/MTPXfVG3/IMG-6288.jpg',
+    'https://i.postimg.cc/nzRM9BLR/IMG-6313.jpg',
+    'https://i.postimg.cc/85KsfMCm/IMG-7473.jpg',
+    'https://i.postimg.cc/76sbJ0LT/IMG-8007.jpg',
+    'https://i.postimg.cc/d1HDZr0y/IMG-8742.jpg',
+    'https://i.postimg.cc/76sbJ0LT/IMG-8007.jpg',
+    'https://i.postimg.cc/d1HDZr0y/IMG-8742.jpg',
+    'https://i.postimg.cc/hjyhQTGX/IMG-9078.jpg',
+    'https://i.postimg.cc/fL2kSmby/IMG-9083.jpg',
+    'https://i.postimg.cc/MTKvGdz1/IMG-9140.jpg',
+    'https://i.postimg.cc/W3bh4Xsq/IMG-9174.jpg',
+    'https://i.postimg.cc/hjPfGpKh/IMG-9996.jpg',
+  ];
+
+  // Chữ mặc định in trên mọi thẻ (để '' nếu không muốn hiện)
+  const DEFAULT_TITLE = 'Vũ & Quỳnh';
+  const DEFAULT_TAG   = '15 . 01 . 2027';
+
+  // (Tuỳ chọn) Riêng cho từng ảnh — số là thứ tự ảnh trong danh sách trên (bắt đầu từ 1).
+  //   title    tiêu đề    tag     nhãn nhỏ dưới ảnh    caption   mô tả 1–3 dòng
+  //   pos      điểm giữ lại khi ảnh bị cắt, '50% 20%' = ưu tiên phần phía trên (giữ mặt người)
+  //   accent   màu vầng sáng nền, ví dụ '#b28a52' (bỏ trống = tự lấy theo màu ảnh)
+  // Ví dụ (xoá dấu // ở đầu dòng để dùng):
+  const PHOTO_DETAILS = {
+    1:  { title:'Hồ tây', tag:'08 . 04 . 2023', caption:'' },
+    2:  { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    3:  { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    4:  { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    5:  { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    6:  { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    7:  { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    8:  { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    9:  { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    10: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    11: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    12: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    13: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    14: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    15: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    16: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    17: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    18: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    19: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    20: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    21: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    22: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    23: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    24: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    25: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    26: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    27: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    28: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    29: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    30: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    31: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    32: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    33: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    34: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    35: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    36: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    37: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    38: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+    39: { title:'Vũ & Quỳnh', tag:'15 . 01 . 2027', caption:'' },
+  };
+
+  const AUTOPLAY_MS = 3000;   // thời gian giữa hai lần tự chuyển ảnh (mili giây)
+
+
+  /* ---------------------- phần dưới không cần sửa ---------------------- */
+
+  const photos = PHOTO_LINKS.map((src, i) => Object.assign(
+    { src, title:DEFAULT_TITLE, tag:DEFAULT_TAG, caption:'', pos:'50% 30%' },
+    PHOTO_DETAILS[i + 1] || {}
+  ));
+  const N       = photos.length;
+  const section = document.getElementById('album');
+  const wrap    = document.getElementById('deckWrap');
+  const deck    = document.getElementById('deck');
+  const glowBox = document.getElementById('albumGlow');
+  if (!section || !deck || !N) return;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const DEFAULT_ACC  = [178, 138, 82];
+
+  const lighten = c => c.map(v => Math.round(v + (255 - v) * 0.5));
+
+  function hexToRgb(h){
+    const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(String(h || '').trim());
+    return m ? [parseInt(m[1],16), parseInt(m[2],16), parseInt(m[3],16)] : null;
   }
-});
 
-
-// Featured "Years of experience" number: counts up from 0 the first time it
-// scrolls into view, instead of just sitting there as static text.
-(function initStatHero(){
-  const stat = document.querySelector(".stat-hero");
-  const numEl = stat && stat.querySelector(".stat-hero-num");
-  if (!stat || !numEl) return;
-  const target = parseInt(stat.dataset.countTo, 10) || 0;
-
-  if (prefersReducedMotion || !("IntersectionObserver" in window)){
-    numEl.textContent = target;
-    return;
+  // Làm màu trích từ ảnh tươi và sáng hơn để vầng sáng nền nhìn rõ (ảnh đen trắng thì dùng màu vàng mặc định)
+  function vivid(c){
+    const r = c[0] / 255, g = c[1] / 255, b = c[2] / 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+    if (d < 0.04) return DEFAULT_ACC;
+    let l = (mx + mn) / 2;
+    let s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+    let h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    h /= 6;
+    s = Math.min(0.85, Math.max(0.4, s * 1.15));
+    l = Math.min(0.62, Math.max(0.5, l));
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
+    const f = t => {
+      if (t < 0) t += 1; if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    };
+    return [f(h + 1/3), f(h), f(h - 1/3)].map(v => Math.round(v * 255));
   }
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      io.unobserve(stat);
-      const dur = 900, t0 = performance.now();
-      (function tick(now){
-        const p = Math.min((now - t0) / dur, 1);
-        const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
-        numEl.textContent = Math.round(eased * target);
-        if (p < 1) requestAnimationFrame(tick);
-      })(t0);
-    });
-  }, { threshold: 0.5 });
-  io.observe(stat);
-})();
 
-// Elements marked data-rv fade / un-blur / rise as they scroll into view.
-(function initReveal(){
-  const items = document.querySelectorAll("[data-rv]");
-  if (!items.length) return;
-  if (prefersReducedMotion || !("IntersectionObserver" in window)) return; // everything simply stays visible
+  /* ---------- dựng thẻ ---------- */
+  const cards   = [];
+  const glows   = [];
+  const imgs    = [];                       // phần tử <img> của từng thẻ (null nếu chưa có ảnh)
+  const started = photos.map(() => false);  // đã bắt đầu tải ảnh chưa
+  const retried = photos.map(() => false);
+  const failed  = photos.map(() => false);
 
-  document.documentElement.classList.add("rv-on");
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const el = entry.target;
-      io.unobserve(el);
-      // small stagger between siblings that enter together (cards in a row, timeline items…)
-      const sibs = Array.from(el.parentElement.children).filter(c => c.hasAttribute("data-rv"));
-      const delay = Math.min(sibs.indexOf(el), 4) * 90;
-      el.style.setProperty("--d", delay + "ms");
-      el.classList.add("in");
-      // once finished, drop the reveal classes so hover transitions on the cards work normally
-      setTimeout(() => {
-        el.classList.remove("rv", "in");
-        el.style.removeProperty("--d");
-      }, delay + 1500);
+  function setAccent(i, c){
+    cards[i].style.setProperty('--acc', c.join(','));
+    cards[i].style.setProperty('--acc-l', lighten(c).join(','));
+    glows[i].style.setProperty('--acc', c.join(','));
+  }
+
+  // Lấy màu chủ đạo từ chính ảnh đang hiển thị (không tải thêm lần nữa).
+  // Nếu ảnh ở máy chủ khác không cho đọc pixel thì bỏ qua, dùng màu vàng mặc định.
+  function sampleFrom(im){
+    try{
+      const S = 20;
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = S;
+      const g = cv.getContext('2d', { willReadFrequently:true });
+      g.drawImage(im, 0, 0, S, S);
+      const d = g.getImageData(0, 0, S, S).data;
+      let r = 0, gr = 0, b = 0, w = 0;
+      for (let k = 0; k < d.length; k += 4){
+        const R = d[k], G = d[k+1], B = d[k+2];
+        const mx = Math.max(R,G,B), mn = Math.min(R,G,B);
+        const sat = mx ? (mx - mn) / mx : 0;
+        const lum = (R + G + B) / 765;
+        const wt = 0.05 + sat * sat * 1.5 + (lum > 0.15 && lum < 0.9 ? 0.1 : 0);
+        r += R * wt; gr += G * wt; b += B * wt; w += wt;
+      }
+      return w ? [r / w, gr / w, b / w].map(Math.round) : null;
+    }catch(e){ return null; }
+  }
+
+  photos.forEach((p, i) => {
+    const card = document.createElement('article');
+    card.className = 'pcard';
+    card.dataset.pos = 'hidden';
+    card.setAttribute('aria-label', p.title || ('Ảnh ' + (i + 1)));
+
+    // tiêu đề
+    if (p.title){
+      const title = document.createElement('div');
+      title.className = 'pcard-title';
+      title.textContent = p.title;
+      card.appendChild(title);
+    }
+
+    // ảnh (chỉ gắn link khi gần tới lượt — xem loadImg)
+    const fig = document.createElement('figure');
+    fig.className = 'pcard-photo';
+    if (p.pos) fig.style.setProperty('--pos', p.pos);
+
+    let img = null;
+    if (p.src){
+      img = document.createElement('img');
+      img.alt = p.title || 'Ảnh cưới';
+      img.decoding = 'async';
+      img.draggable = false;
+      img.addEventListener('load', () => {
+        if (img.crossOrigin && !photos[i].accent){       // còn ở chế độ đọc được pixel
+          const rgb = sampleFrom(img);
+          if (rgb) setAccent(i, vivid(rgb));
+        }
+      });
+      img.addEventListener('error', () => {
+        if (img.crossOrigin && !retried[i]){
+          // máy chủ không cho đọc màu → thử lại kiểu thường để vẫn hiện được ảnh
+          retried[i] = true;
+          img.removeAttribute('crossorigin');
+          img.src = p.src;
+        } else {
+          markFailed(i);
+        }
+      });
+      fig.appendChild(img);
+    } else {
+      fig.classList.add('empty');
+      fig.dataset.label = 'Ảnh của bạn tại đây';
+    }
+    imgs.push(img);
+
+    if (p.tag){
+      const pill = document.createElement('span');
+      pill.className = 'pcard-pill';
+      pill.textContent = p.tag;
+      fig.appendChild(pill);
+    }
+    card.appendChild(fig);
+
+    // mô tả
+    if (p.caption){
+      const cap = document.createElement('p');
+      cap.className = 'pcard-cap';
+      cap.textContent = p.caption;
+      card.appendChild(cap);
+    }
+
+    deck.appendChild(card);
+    cards.push(card);
+
+    // lớp vầng sáng nền tương ứng
+    const glow = document.createElement('i');
+    glowBox.appendChild(glow);
+    glows.push(glow);
+
+    // màu: ưu tiên "accent" tự đặt, không thì lấy theo ảnh, không được thì màu vàng
+    setAccent(i, hexToRgb(p.accent) || DEFAULT_ACC);
+  });
+
+  /* ---------- vòng lướt: chỉ gồm những thẻ còn dùng được ---------- */
+  let order = photos.map((_, i) => i);
+  let cur = 0;
+  let near = false;                       // đã cuộn gần tới mục Album chưa
+
+  function loadImg(i){
+    if (started[i] || !imgs[i]) return;
+    started[i] = true;
+    imgs[i].crossOrigin = 'anonymous';
+    imgs[i].src = photos[i].src;
+  }
+
+  // Chỉ tải vài ảnh quanh thẻ hiện tại → 40 ảnh cũng không làm nặng trang
+  function preload(){
+    if (!near) return;
+    const M = order.length, k = order.indexOf(cur);
+    for (let d = -1; d <= 4; d++) loadImg(order[(k + d + M) % M]);
+  }
+
+  function markFailed(i){
+    if (failed[i]) return;
+    failed[i] = true;
+    if (imgs[i]) imgs[i].remove();
+    const fig = cards[i].querySelector('.pcard-photo');
+    fig.classList.add('empty');
+    fig.dataset.label = 'Không tải được ảnh';
+
+    const k = order.indexOf(i);
+    if (k < 0) return;
+    order.splice(k, 1);
+    if (!order.length){
+      // không ảnh nào tải được (chưa gán link/chưa tải ảnh lên): hiện vài khung mẫu
+      order = photos.map((_, j) => j).slice(0, Math.min(6, N));
+      order.forEach(j => { cards[j].querySelector('.pcard-photo').dataset.label = 'Ảnh của bạn tại đây'; });
+    }
+    if (order.indexOf(cur) < 0) cur = order[k % order.length];
+    render(0, null);
+  }
+
+  function posOf(i){
+    const M = order.length, r = order.indexOf(i);
+    if (r < 0) return 'gone';
+    const rel = (r - order.indexOf(cur) + M) % M;
+    if (rel === 0) return 'front';
+    if (rel === 1) return 'next';
+    if (M > 2 && rel === M - 1) return 'prev';
+    if (rel === 2) return 'next2';
+    return 'hidden';
+  }
+
+  const raiseTimers = new Map();
+  function raise(el){
+    el.classList.add('raise');
+    clearTimeout(raiseTimers.get(el));
+    raiseTimers.set(el, setTimeout(() => el.classList.remove('raise'), 650));
+  }
+
+  function render(dir, oldCur){
+    cards.forEach((el, i) => {
+      const pos = posOf(i);
+      el.dataset.pos = pos;
+      el.inert = pos !== 'front';
+      el.setAttribute('aria-hidden', pos === 'front' ? 'false' : 'true');
     });
-  }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
-  items.forEach(el => io.observe(el));
+    glows.forEach((g, i) => g.classList.toggle('on', i === cur));
+    preload();
+
+    if (dir > 0 && oldCur != null) raise(cards[oldCur]);   // thẻ cũ bay xuống, nằm trên thẻ mới
+    if (dir < 0) raise(cards[cur]);                        // thẻ quay lại bay lên, nằm trên cùng
+  }
+
+  function go(dir){
+    const old = cur, M = order.length;
+    cur = order[(order.indexOf(cur) + dir + M) % M];
+    render(dir, old);
+    schedule();
+  }
+
+  /* ---------- tự chạy ---------- */
+  let timer = null, inView = false, hovering = false, focused = false, dragging = false;
+  const lb = document.getElementById('lb');
+
+  function canAuto(){
+    return !reduceMotion && order.length > 1 && inView && !hovering && !focused && !dragging
+        && !document.hidden && !lb.classList.contains('open');
+  }
+
+  function schedule(){
+    clearTimeout(timer);
+    timer = null;
+    if (canAuto()) timer = setTimeout(() => go(1), AUTOPLAY_MS);
+  }
+
+  if ('IntersectionObserver' in window){
+    new IntersectionObserver(entries => {
+      inView = entries[0].isIntersecting;
+      schedule();
+    }, { threshold: 0.35 }).observe(section);
+
+    new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !near){ near = true; preload(); }
+    }, { rootMargin: '900px 0px' }).observe(section);
+  } else {
+    inView = true; near = true;
+  }
+
+  document.addEventListener('visibilitychange', schedule);
+  wrap.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse'){ hovering = true; schedule(); } });
+  wrap.addEventListener('pointerleave', () => { hovering = false; schedule(); });
+  wrap.addEventListener('focusin',  () => { focused = true;  schedule(); });
+  wrap.addEventListener('focusout', () => { focused = false; schedule(); });
+
+  /* ---------- bàn phím ---------- */
+  wrap.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight'){ e.preventDefault(); go(1); }
+    else if (e.key === 'ArrowLeft'){ e.preventDefault(); go(-1); }
+    else if (e.key === 'Enter' && e.target === wrap){ openLightbox(cur); }
+  });
+
+  /* ---------- vuốt / kéo thẻ ---------- */
+  let sx = 0, sy = 0, dx = 0, dy = 0, t0 = 0, moved = false, pid = null;
+
+  deck.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (e.target.closest('.pcard-open')) return;
+    const front = cards[cur];
+    if (!front.contains(e.target)) return;
+    dragging = true; moved = false;
+    sx = e.clientX; sy = e.clientY; dx = dy = 0;
+    t0 = performance.now();
+    pid = e.pointerId;
+    try{ front.setPointerCapture(e.pointerId); }catch(_){}
+    schedule();
+  });
+
+  deck.addEventListener('pointermove', e => {
+    if (!dragging || e.pointerId !== pid) return;
+    dx = e.clientX - sx;
+    dy = e.clientY - sy;
+    if (!moved && Math.hypot(dx, dy) > 6){
+      moved = true;
+      cards[cur].classList.add('dragging');
+    }
+    if (moved){
+      const ty = dy > 0 ? dy * 0.5 : dy * 0.15;
+      cards[cur].style.transform =
+        'translate3d(' + dx + 'px,' + ty + 'px,0) rotate(' + (dx / 22) + 'deg)';
+    }
+  });
+
+  function endDrag(e, cancelled){
+    if (!dragging || e.pointerId !== pid) return;
+    dragging = false;
+
+    const front = cards[cur];
+    front.style.transform = '';
+    front.classList.remove('dragging');
+
+    if (!moved){
+      if (!cancelled) openLightbox(cur);   // chạm nhẹ vào thẻ = xem ảnh lớn
+      schedule();
+      return;
+    }
+
+    const vx = dx / Math.max(1, performance.now() - t0);
+    let dir = 0;
+    if (Math.abs(dx) > 60 || (Math.abs(vx) > 0.45 && Math.abs(dx) > 20)) dir = dx < 0 ? 1 : -1;
+    else if (dy > 80 && dy > Math.abs(dx)) dir = 1;      // kéo thẻ xuống (chuột) giống video
+    if (cancelled) dir = 0;
+
+    if (dir) go(dir); else schedule();
+  }
+
+  deck.addEventListener('pointerup',     e => endDrag(e, false));
+  deck.addEventListener('pointercancel', e => endDrag(e, true));
+
+  /* ---------- xem ảnh lớn ---------- */
+  const lbImg   = document.getElementById('lbImg');
+  const lbTitle = document.getElementById('lbTitle');
+  const lbCap   = document.getElementById('lbCap');
+  const lbClose = document.getElementById('lbClose');
+  const lbPrev  = document.getElementById('lbPrev');
+  const lbNext  = document.getElementById('lbNext');
+  let lastFocus = null;
+
+  function fillLb(){
+    const p = photos[cur];
+    lbImg.src = p.src;
+    lbImg.alt = p.title || 'Ảnh cưới';
+    lbTitle.textContent = p.title || '';
+    lbCap.textContent = p.caption || '';
+  }
+
+  function openLightbox(i){
+    if (!photos[i].src || failed[i]) return;
+    if (i !== cur){ const d = order.indexOf(i) > order.indexOf(cur) ? 1 : -1; cur = i; render(d, null); }
+    lastFocus = document.activeElement;
+    fillLb();
+    lb.classList.add('open');
+    lb.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    lbClose.focus();
+    schedule();
+  }
+
+  function closeLightbox(){
+    lb.classList.remove('open');
+    lb.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    lbImg.removeAttribute('src');
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+    schedule();
+  }
+
+  function stepLb(dir){
+    // bỏ qua những thẻ chưa có ảnh
+    for (let k = 0; k < order.length; k++){
+      go(dir);
+      if (photos[cur].src && !failed[cur]) break;
+    }
+    fillLb();
+  }
+
+  lbClose.addEventListener('click', closeLightbox);
+  lbPrev.addEventListener('click', () => stepLb(-1));
+  lbNext.addEventListener('click', () => stepLb(1));
+  lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
+
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowRight') stepLb(1);
+    else if (e.key === 'ArrowLeft') stepLb(-1);
+    else if (e.key === 'Tab'){
+      const f = [lbClose, lbPrev, lbNext];
+      const i = f.indexOf(document.activeElement);
+      e.preventDefault();
+      f[(i + (e.shiftKey ? f.length - 1 : 1)) % f.length].focus();
+    }
+  });
+
+  // hiển thị lần đầu (không có hiệu ứng chuyển)
+  render(0, null);
+
 })();
-/* =========================================================
-   BACKGROUND MUSIC
-   Browsers block sound autoplay until the visitor interacts with the page,
-   so: try to play immediately; if blocked, start on the first click / tap /
-   key press anywhere on the page.
-   ========================================================= */
-(function initMusic(){
-  const audio = document.getElementById("bgMusic");
-  const btn = document.getElementById("musicBtn");
-  if (!audio || !btn) return;
+</script>
+
+
+<!-- NHẠC NỀN -->
+<audio id="bgm" src="./nhac.mp3" loop preload="auto" playsinline></audio>
+<button class="music-btn" id="musicBtn" type="button" aria-label="Bật/tắt nhạc">
+  <svg class="ic-on" viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3z"/></svg>
+  <svg class="ic-off" viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3z" opacity=".5"/><path d="M3 4.3 4.3 3 21 19.7 19.7 21z"/></svg>
+</button>
+
+<script>
+/* =====================================================================
+   NHẠC NỀN — tự phát khi mở trang
+   Đổi tên file nhạc ở thẻ <audio id="bgm" src="..."> phía trên.
+   Trình duyệt thường chặn tự phát có tiếng, nên nếu bị chặn, nhạc sẽ
+   bắt đầu ngay ở lần chạm / cuộn / bấm phím đầu tiên của khách.
+   ===================================================================== */
+(function(){
+  const audio = document.getElementById('bgm');
+  const btn = document.getElementById('musicBtn');
   audio.volume = 0.6;
   let userPaused = false;
 
-  const sync = () => {
-    const off = audio.paused;
-    btn.classList.toggle("is-off", off);
-    btn.setAttribute("aria-label", off ? "Turn music on" : "Turn music off");
-  };
-  audio.addEventListener("play", sync);
-  audio.addEventListener("pause", sync);
+  function setUI(on){
+    btn.classList.toggle('playing', on);
+    btn.classList.toggle('muted', !on);
+  }
+  function tryPlay(){
+    if (userPaused) return Promise.resolve();
+    return audio.play().then(() => { setUI(true); removeUnlock(); })
+                       .catch(() => setUI(false));
+  }
+  const evts = ['pointerdown','touchstart','click','keydown','scroll','wheel'];
+  function unlock(e){
+    if (e.target === btn || btn.contains(e.target)) return;
+    tryPlay();
+  }
+  function removeUnlock(){ evts.forEach(t => window.removeEventListener(t, unlock, true)); }
+  evts.forEach(t => window.addEventListener(t, unlock, { capture:true, passive:true }));
 
-  const tryPlay = () => audio.play().then(sync).catch(() => { sync(); });
-
-  const unlock = () => {
-    if (!userPaused && audio.paused) tryPlay();
-    if (!audio.paused) {
-      ["pointerdown","touchstart","keydown","click"].forEach(ev => window.removeEventListener(ev, unlock));
-    }
-  };
-  ["pointerdown","touchstart","keydown","click"].forEach(ev => window.addEventListener(ev, unlock, { passive:true }));
-
-  btn.addEventListener("click", (e) => {
-    e.stopPropagation();
+  btn.addEventListener('click', () => {
     if (audio.paused){ userPaused = false; tryPlay(); }
-    else { userPaused = true; audio.pause(); }
+    else { userPaused = true; audio.pause(); setUI(false); }
   });
 
-  tryPlay(); // works if the browser allows autoplay
-  sync();
+  // Tạm dừng khi rời tab, phát lại khi quay lại
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) audio.pause();
+    else if (!userPaused && !audio.paused === false && btn.classList.contains('playing')) audio.play().catch(()=>{});
+  });
+
+  setUI(false);
+  tryPlay();   // thử tự phát ngay khi tải trang
 })();
 </script>
 
