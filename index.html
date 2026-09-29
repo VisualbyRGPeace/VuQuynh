@@ -438,44 +438,6 @@
     color:var(--ink-900);
   }
 
-  /* ---------- DRESSCODE / NOTES ---------- */
-  .notes{ background:var(--cream-100); }
-
-  .note-block{ text-align:center; margin-bottom:46px; }
-  .note-block:last-child{ margin-bottom:0; }
-
-  .note-block h3{
-    font-family:var(--serif-sc);
-    font-weight:500;
-    font-size:14.5px;
-    letter-spacing:.14em;
-    margin:0 0 14px;
-    color:var(--ink-900);
-  }
-
-  .note-block p{
-    max-width:48ch;
-    margin:0 auto;
-    color:var(--ink-700);
-    line-height:1.75;
-    font-size:16px;
-    font-style:italic;
-  }
-
-  .palette{
-    display:flex;
-    justify-content:center;
-    gap:10px;
-    margin-top:20px;
-  }
-
-  .palette span{
-    width:24px;
-    height:24px;
-    border-radius:50%;
-    border:1px solid rgba(0,0,0,.08);
-  }
-
   /* ---------- RSVP ---------- */
   .rsvp{ background:var(--pine-900); color:var(--cream-100); padding-bottom:70px; }
 
@@ -729,6 +691,16 @@
 
   .album .section-inner{ position:relative; z-index:1; }
   .album .kicker{ margin-bottom:10px; }
+
+  .album-story{
+    max-width:52ch;
+    margin:0 auto 34px;
+    text-align:center;
+    font-style:italic;
+    font-size:clamp(16px,2.4vw,19px);
+    line-height:1.75;
+    color:var(--ink-700);
+  }
 
   .deck-wrap{
     margin:0 -24px;          /* để thẻ ghost hai bên không bị cắt sát mép màn hình */
@@ -1077,8 +1049,7 @@
 
 <nav class="nav" id="nav">
   <a href="#home">Home</a>
-  <a href="#love-story">Love Story</a>
-  <a href="#album">Album</a>
+  <a href="#album">Love Story</a>
   <a href="#details">Details</a>
   <a href="#rsvp">Wishes</a>
 </nav>
@@ -1119,52 +1090,17 @@
 
 </header>
 
-<!-- ===================== INVITE ===================== -->
-<section class="invite">
-  <div class="section-inner">
-
-    <p class="kicker" style="font-size:clamp(38px,6.5vw,54px);">Thiệp mời</p>
-    <hr class="divider">
-
-    <p>
-      Chúng tôi trân trọng kính mời bạn đến chung vui trong ngày trọng đại
-      của đời mình. Sự hiện diện của bạn chính là món quà ý nghĩa nhất,
-      cùng chúng tôi lưu giữ những khoảnh khắc đáng nhớ này.
-    </p>
-
-  </div>
-</section>
-
-<!-- ===================== LOVE STORY ===================== -->
-<section class="story" id="love-story">
-  <div class="section-inner wide">
-
-    <p class="kicker on-dark">Chuyện tình yêu</p>
-    <hr class="divider">
-
-    <div class="story-row">
-      <div class="placeholder-photo">Ảnh của bạn<br>tại đây</div>
-      <div>
-        <span class="tag">Khởi đầu</span>
-        <p>
-          [Placeholder — hãy thay bằng câu chuyện thật của hai bạn]
-          Chúng tôi gặp nhau trong một ngày rất bình thường, nhưng không ngờ
-          đó lại là khởi đầu của một hành trình đặc biệt. Từ những cuộc trò
-          chuyện đầu tiên, chúng tôi đã tìm thấy ở nhau sự đồng điệu hiếm có.
-        </p>
-      </div>
-    </div>
-
-  </div>
-</section>
-
 <!-- ===================== ALBUM ===================== -->
 <section class="album" id="album">
   <div class="album-glow" id="albumGlow" aria-hidden="true"></div>
 
   <div class="section-inner wide">
 
-    <p class="kicker">Khoảnh khắc yêu thương</p>
+    <p class="album-story">
+      Câu chuyện của chúng tôi bắt đầu từ ngày 07.09.2021 — ngày Vũ gặp Quỳnh.
+      Từ đó đến nay, mỗi khoảnh khắc bên nhau đều trở thành một trang ký ức
+      đáng nhớ trên hành trình đến với ngày hôm nay.
+    </p>
 
     <div class="deck-wrap" id="deckWrap" tabindex="0" role="region"
          aria-roledescription="carousel"
@@ -1191,6 +1127,22 @@
     <figcaption><strong id="lbTitle"></strong><span id="lbCap"></span></figcaption>
   </figure>
 </div>
+
+<!-- ===================== INVITE ===================== -->
+<section class="invite">
+  <div class="section-inner">
+
+    <p class="kicker" style="font-size:clamp(38px,6.5vw,54px);">Thiệp mời</p>
+    <hr class="divider">
+
+    <p>
+      Chúng tôi trân trọng kính mời bạn đến chung vui trong ngày trọng đại
+      của đời mình. Sự hiện diện của bạn chính là món quà ý nghĩa nhất,
+      cùng chúng tôi lưu giữ những khoảnh khắc đáng nhớ này.
+    </p>
+
+  </div>
+</section>
 
 <!-- ===================== DETAILS ===================== -->
 <section class="details" id="details">
@@ -1245,36 +1197,6 @@
     <p style="text-align:center;font-size:13px;color:var(--ink-700);opacity:.7;margin-top:22px;">
       [Placeholder — lịch trình mẫu, cập nhật lại giờ chính xác của bạn]
     </p>
-
-  </div>
-</section>
-
-<!-- ===================== NOTES / DRESSCODE ===================== -->
-<section class="notes">
-  <div class="section-inner">
-
-    <div class="note-block">
-      <h3>Trang phục</h3>
-      <p>
-        [Placeholder — chưa có yêu cầu trang phục cụ thể.
-        Ví dụ: "Trang phục lịch sự, tông màu đất ấm được khuyến khích."]
-      </p>
-      <div class="palette" aria-hidden="true">
-        <span style="background:#22362c"></span>
-        <span style="background:#a3603f"></span>
-        <span style="background:#b28a52"></span>
-        <span style="background:#4a392c"></span>
-        <span style="background:#f8f2e6; border-color:rgba(0,0,0,.15)"></span>
-      </div>
-    </div>
-
-    <div class="note-block">
-      <h3>Một lời về quà mừng</h3>
-      <p>
-        Sự hiện diện của bạn là món quà quý giá nhất đối với chúng tôi.
-        Nếu bạn muốn gửi lời chúc phúc, chúng tôi xin trân trọng đón nhận.
-      </p>
-    </div>
 
   </div>
 </section>
