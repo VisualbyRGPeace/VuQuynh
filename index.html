@@ -438,6 +438,79 @@
     color:var(--ink-900);
   }
 
+
+  /* ---------- INTRO: PHONG THƯ ---------- */
+  body.intro-lock{ overflow:hidden; }
+  .intro{
+    position:fixed; inset:0; z-index:1000; overflow:auto;
+    display:flex; align-items:center; justify-content:center; padding:24px;
+    background:radial-gradient(ellipse at 72% 28%, var(--pine-700) 0%, var(--pine-900) 68%);
+    transition:opacity .7s ease, visibility .7s;
+  }
+  .intro.gone{ opacity:0; visibility:hidden; pointer-events:none; }
+
+  .env{
+    position:relative; width:min(86vw,420px); aspect-ratio:1/.78;
+    margin-top:14vh; cursor:pointer; outline:none;
+    transition:transform .45s ease, opacity .45s ease;
+  }
+  .intro.opening .env{ transform:translateY(40px); opacity:0; }
+  .env-flap{
+    position:absolute; left:0; right:0; bottom:calc(100% - 1px); height:46%;
+    background:linear-gradient(var(--cream-100),var(--cream-200));
+    clip-path:polygon(0 100%,50% 0,100% 100%);
+  }
+  .env-back{
+    position:absolute; inset:0; background:var(--cream-200); border-radius:4px 4px 10px 10px;
+    box-shadow:0 30px 60px rgba(0,0,0,.35);
+  }
+  .env-paper{
+    position:absolute; left:6%; right:6%; top:-7%; bottom:30%;
+    background:#fffaf0; border-radius:3px; color:var(--ink-900); text-align:center;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    box-shadow:0 0 40px rgba(215,183,129,.45);
+    transition:transform .5s ease;
+  }
+  .env:hover .env-paper, .env:focus-visible .env-paper{ transform:translateY(-7%); }
+  .env-paper .ep-name{ font-family:var(--script); font-size:clamp(26px,7vw,34px); line-height:1.1; }
+  .env-paper .ep-line{ font-size:clamp(14px,3.6vw,17px); letter-spacing:.04em; }
+  .env-front{
+    position:absolute; inset:0; background:linear-gradient(160deg,var(--cream-100),#e6d5b6);
+    clip-path:polygon(0 36%,50% 70%,100% 36%,100% 100%,0 100%);
+    border-radius:0 0 10px 10px;
+  }
+  .env-caption{
+    position:absolute; left:0; right:0; bottom:10%; text-align:center; color:var(--pine-900);
+    font-size:clamp(17px,4.6vw,23px);
+  }
+  .env-tap{ display:block; margin-top:6px; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--clay-600); }
+
+  .intro-card{
+    display:none; width:min(92vw,400px); text-align:center;
+    background:var(--cream-100); color:var(--ink-900);
+    border-radius:14px; padding:30px 26px 26px;
+    border:1px solid var(--gold-300);
+    box-shadow:0 24px 60px rgba(0,0,0,.35);
+  }
+  .intro.opened .env{ display:none; }
+  .intro.opened .intro-card{ display:block; animation:cardIn .6s ease both; }
+  @keyframes cardIn{ from{ opacity:0; transform:translateY(30px) scale(.96); } to{ opacity:1; transform:none; } }
+  .intro-card h2{ font-family:var(--script); font-weight:400; font-size:36px; line-height:1.1; margin:0 0 4px; color:var(--clay-600); }
+  .intro-card .ic-sub{ margin:0 0 20px; color:var(--ink-700); font-size:15px; }
+  .intro-card label{ display:block; text-align:left; font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-700); margin:14px 0 4px; }
+  .intro-card input, .intro-card textarea{
+    width:100%; font:inherit; font-size:16px; color:var(--ink-900);
+    background:rgba(255,255,255,.6); border:1px solid var(--cream-200); border-radius:8px; padding:10px 12px; resize:vertical;
+  }
+  .intro-card input:focus, .intro-card textarea:focus{ outline:2px solid var(--gold-300); border-color:transparent; }
+  .intro-card button{
+    width:100%; margin-top:20px; padding:13px; border:0; border-radius:999px; cursor:pointer;
+    background:var(--pine-800); color:var(--cream-100); font:inherit; font-size:16px; letter-spacing:.06em;
+  }
+  .intro-card .ic-hint{ margin:12px 0 0; font-size:13px; color:var(--ink-700); }
+
+  .guest{ font-family:var(--script); font-size:1.3em; color:var(--clay-600); }
+
   /* ---------- RSVP ---------- */
   .rsvp{ background:var(--pine-900); color:var(--cream-100); padding-bottom:70px; }
 
@@ -1045,7 +1118,33 @@
 
 </head>
 
-<body>
+<body class="intro-lock">
+
+<div class="intro" id="intro" role="dialog" aria-modal="true" aria-label="Thư mời cưới">
+  <div class="env" id="env" role="button" tabindex="0" aria-label="Chạm để mở thư mời">
+    <div class="env-flap"></div>
+    <div class="env-back"></div>
+    <div class="env-paper">
+      <span class="ep-name">Vũ &amp; Quỳnh</span>
+      <span class="ep-line">Bạn có một lời mời</span>
+      <span class="ep-line">15 . 01 . 2027</span>
+    </div>
+    <div class="env-front"></div>
+    <div class="env-caption">Gửi lời chúc đến cô dâu &amp; chú rể<span class="env-tap">Chạm để mở</span></div>
+  </div>
+
+  <form class="intro-card" id="introForm">
+    <h2>Gửi lời chúc</h2>
+    <p class="ic-sub">đến cô dâu &amp; chú rể</p>
+    <label for="introName">Tên của bạn</label>
+    <input type="text" id="introName" maxlength="60" required autocomplete="name">
+    <label for="introMsg">Lời chúc (không bắt buộc)</label>
+    <textarea id="introMsg" rows="3" maxlength="400"></textarea>
+    <button type="submit">Gửi &amp; mở thiệp</button>
+    <p class="ic-hint">Lời chúc sẽ xuất hiện trên tường lời chúc ở cuối trang.</p>
+  </form>
+</div>
+
 
 <nav class="nav" id="nav">
   <a href="#home">Home</a>
@@ -1136,7 +1235,7 @@
     <hr class="divider">
 
     <p>
-      Chúng tôi trân trọng kính mời bạn đến chung vui trong ngày trọng đại
+      Chúng tôi trân trọng kính mời <span class="guest" id="guestName">bạn</span> đến chung vui trong ngày trọng đại
       của đời mình. Sự hiện diện của bạn chính là món quà ý nghĩa nhất,
       cùng chúng tôi lưu giữ những khoảnh khắc đáng nhớ này.
     </p>
@@ -2010,6 +2109,69 @@
   window.addEventListener('DOMContentLoaded', tryPlay);
   window.addEventListener('load', tryPlay);
   window.addEventListener('pageshow', tryPlay);   // thử tự phát ngay khi tải trang
+})();
+</script>
+
+<script>
+/* Phong thư mở đầu: nhập tên -> thay vào lời mời; lời chúc gửi chung Firebase với mục "Gửi lời chúc" */
+(function(){
+  const intro = document.getElementById('intro');
+  const env = document.getElementById('env');
+  const iform = document.getElementById('introForm');
+  const nameIn = document.getElementById('introName');
+  const msgIn = document.getElementById('introMsg');
+  const guest = document.getElementById('guestName');
+  const mainName = document.getElementById('fullName');
+  const stat = document.getElementById('formStatus');
+
+  function setGuest(n){ guest.textContent = (n || '').trim() || 'bạn'; }
+
+  // tên có sẵn: từ link ?ten=... hoặc lần truy cập trước
+  let pre = new URLSearchParams(location.search).get('ten') || '';
+  try { pre = pre || localStorage.getItem('guestName') || ''; } catch(e){}
+  pre = pre.trim().slice(0, 60);
+  if (pre){ nameIn.value = pre; mainName.value = pre; setGuest(pre); }
+
+  function openLetter(){
+    intro.classList.add('opening');
+    setTimeout(() => { intro.classList.add('opened'); nameIn.focus({ preventScroll:true }); }, 450);
+  }
+  env.addEventListener('click', openLetter);
+  env.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openLetter(); }
+  });
+
+  function closeIntro(){
+    intro.classList.add('gone');
+    document.body.classList.remove('intro-lock');
+    window.scrollTo(0, 0);
+    setTimeout(() => intro.remove(), 800);
+  }
+
+  iform.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = nameIn.value.trim();
+    const message = msgIn.value.trim();
+    if (!name){ nameIn.focus(); return; }
+
+    setGuest(name);
+    mainName.value = name;
+    try { localStorage.setItem('guestName', name); } catch(err){}
+
+    if (message){
+      if (typeof wishesRef !== 'undefined' && wishesRef){
+        wishesRef.push({ name, message, time: Date.now() }).catch(() => {});
+      } else if (typeof addStamp === 'function'){
+        addStamp(name, message);
+      }
+      stat.textContent = 'Cảm ơn ' + name + '! Lời chúc đã được gửi.';
+      stat.style.color = '#d7b781';
+    }
+    closeIntro();
+  });
+
+  // gõ tên ở mục "Gửi lời chúc" bên dưới cũng cập nhật lời mời
+  mainName.addEventListener('input', () => setGuest(mainName.value));
 })();
 </script>
 
