@@ -38,7 +38,7 @@ section{padding:clamp(72px,11vw,120px) 24px;scroll-margin-top:56px}
 :focus-visible{outline:2px solid var(--gold-500);outline-offset:3px}
 
 /* chữ & tiêu đề */
-.kicker{font:400 clamp(36px,6vw,54px)/1.15 var(--script);text-align:center;color:var(--clay);margin:0 0 6px}
+.kicker{font:400 clamp(30px,5vw,44px)/1.2 var(--script);text-align:center;color:var(--clay);margin:0 0 6px}
 .heading{font-weight:500;font-size:clamp(28px,4.6vw,40px);line-height:1.2;text-align:center;letter-spacing:.04em;margin:0 0 44px}
 .on-dark .kicker,.kicker.light{color:var(--gold-300)}
 .divider{width:64px;height:1px;border:0;background:var(--gold-500);margin:28px auto;position:relative;overflow:visible}
@@ -60,7 +60,7 @@ section{padding:clamp(72px,11vw,120px) 24px;scroll-margin-top:56px}
   background:radial-gradient(70% 45% at 50% 0,rgba(226,204,155,.14),transparent 70%),linear-gradient(180deg,#2e4c3d,var(--pine-950))}
 .hero>*{position:relative}
 .hero>*:not(.cue){opacity:0;animation:rise 1.1s var(--ease) forwards}
-.hero-eyebrow{font:400 clamp(26px,4vw,34px) var(--script);color:var(--gold-300);margin:0 0 18px;animation-delay:.15s!important}
+.hero-eyebrow{font:400 clamp(22px,3.4vw,28px) var(--script);color:var(--gold-300);margin:0 0 18px;animation-delay:.15s!important}
 .hero-logo{width:min(70vw,520px);animation-delay:.35s!important}
 .hero-logo img{width:100%;height:auto}
 .hero-date{margin:34px 0 4px;font-size:clamp(19px,2.6vw,24px);letter-spacing:.24em;color:var(--cream-200);animation-delay:.6s!important}
@@ -119,31 +119,25 @@ section{padding:clamp(72px,11vw,120px) 24px;scroll-margin-top:56px}
 .cards{display:grid;gap:22px;margin-bottom:64px}
 @media(min-width:680px){.cards{grid-template-columns:1fr 1fr}}
 .card{background:var(--cream-50);border:1px solid rgba(184,152,90,.35);border-radius:12px;padding:38px 28px;text-align:center}
-.tag{display:block;font:400 30px/1.2 var(--script);color:var(--clay);margin-bottom:6px}
+.tag{display:block;font:400 25px/1.25 var(--script);color:var(--clay);margin-bottom:6px}
 .card h3{margin:0 0 12px;font-size:18px;font-weight:500;letter-spacing:.08em}
 .card p{margin:0 0 24px;color:var(--ink-2);font-size:18px;line-height:1.6}
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 28px;border:1px solid var(--gold-700);border-radius:99px;font:500 16px var(--serif);letter-spacing:.08em;text-decoration:none;color:var(--ink);cursor:pointer;transition:background .3s,color .3s}
 .btn:hover{background:var(--pine-900);border-color:var(--pine-900);color:var(--cream-50)}
-/* LỊCH TRÌNH: mobile = dọc, giờ bên trái – việc bên phải, trục vàng ở giữa */
-.timeline{list-style:none;margin:0 auto;padding:0;max-width:400px}
-.timeline li{display:grid;grid-template-columns:1fr 22px 1fr;column-gap:14px;align-items:center;min-height:84px}
-.timeline li::before{content:"";order:1;align-self:stretch;background-repeat:no-repeat;
-  background-image:radial-gradient(circle,var(--gold-500) 0 4px,var(--cream-200) 4.5px 8px,transparent 8.5px),linear-gradient(var(--gold-500),var(--gold-500));
-  background-position:0 0,center center;background-size:auto,1px 100%}
-.timeline li:first-child::before{background-position:0 0,center bottom;background-size:auto,1px 50%}
-.timeline li:last-child::before{background-position:0 0,center top;background-size:auto,1px 50%}
-.timeline b{order:0;text-align:right;font-weight:500;font-size:clamp(22px,6.4vw,28px);letter-spacing:.06em;color:var(--gold-700);font-variant-numeric:lining-nums tabular-nums}
-.timeline span{order:2;font:400 clamp(28px,7.6vw,34px)/1.2 var(--script);color:var(--ink)}
-
-/* desktop = ngang, 4 cột, giờ ở trên – việc ở dưới */
+/* LỊCH TRÌNH: mobile = lưới 2x2 kẻ mảnh, desktop = 4 cột */
+.timeline{list-style:none;margin:0 auto;padding:0;max-width:440px;display:grid;grid-template-columns:1fr 1fr}
+.timeline li{padding:30px 10px;text-align:center;border-bottom:1px solid rgba(184,152,90,.5)}
+.timeline li:nth-child(odd){border-right:1px solid rgba(184,152,90,.5)}
+.timeline li:nth-last-child(-n+2){border-bottom:0}
+.timeline b{display:block;margin-bottom:6px;font-weight:500;font-size:22px;letter-spacing:.08em;color:var(--gold-700);font-variant-numeric:lining-nums tabular-nums}
+.timeline span{display:block;font:400 25px/1.3 var(--script);color:var(--ink)}
 @media(min-width:760px){
-  .timeline{max-width:none;display:grid;grid-template-columns:repeat(4,1fr)}
-  .timeline li{grid-template-columns:none;grid-template-rows:auto 26px auto;row-gap:12px;justify-items:center;text-align:center;min-height:0}
-  .timeline li::before{width:100%;align-self:stretch;background-position:0 0,center center;background-size:auto,100% 1px}
-  .timeline li:first-child::before{background-position:0 0,right center;background-size:auto,50% 1px}
-  .timeline li:last-child::before{background-position:0 0,left center;background-size:auto,50% 1px}
-  .timeline b{text-align:center;font-size:30px}
-  .timeline span{font-size:36px}
+  .timeline{max-width:900px;grid-template-columns:repeat(4,1fr)}
+  .timeline li{padding:14px 12px;border:0}
+  .timeline li:nth-child(odd){border-right:0}
+  .timeline li+li{border-left:1px solid rgba(184,152,90,.5)}
+  .timeline b{font-size:26px}
+  .timeline span{font-size:30px}
 }
 
 /* HỘP HỎI TÊN */
@@ -151,7 +145,7 @@ section{padding:clamp(72px,11vw,120px) 24px;scroll-margin-top:56px}
 .intro.gone{opacity:0;visibility:hidden;pointer-events:none}
 .intro-box{position:relative;width:min(92vw,360px);text-align:center;background:var(--cream-50);border:1px solid var(--gold-300);border-radius:20px;padding:34px 24px 24px;box-shadow:0 24px 60px rgba(0,0,0,.35);animation:pop .6s var(--ease) both}
 @keyframes pop{from{opacity:0;transform:translateY(18px) scale(.96)}}
-.intro-box label{display:block;font:400 36px/1.1 var(--script);color:var(--clay);margin-bottom:16px}
+.intro-box label{display:block;font:400 30px/1.15 var(--script);color:var(--clay);margin-bottom:16px}
 .intro-box input{width:100%;font:inherit;font-size:17px;text-align:center;color:var(--ink);background:#fff;border:1px solid var(--cream-200);border-radius:99px;padding:13px 16px}
 .intro-box input:focus{outline:2px solid var(--gold-300);border-color:transparent}
 .intro-box .btn{width:100%;margin-top:12px;background:var(--pine-900);border-color:var(--pine-900);color:var(--cream-50)}
